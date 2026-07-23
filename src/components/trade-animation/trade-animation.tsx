@@ -133,7 +133,7 @@ const TradeAnimation = observer(({ className, should_show_overlay }: TTradeAnima
 
     // Fix TypeScript error by ensuring active_tab is a number
     // Use a fallback to dashboard if active_tab is undefined
-    const safeActiveTab = typeof active_tab === 'number' ? active_tab : DBOT_TABS.DASHBOARD;
+    const safeActiveTab = typeof active_tab === 'number' ? active_tab : DBOT_TABS.BOT_BUILDER;
 
     // Function to determine tooltip alignment based on run panel position
     const determineTooltipAlignment = (): string => {
