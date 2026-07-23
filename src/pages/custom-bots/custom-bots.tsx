@@ -2,6 +2,7 @@
 import React from 'react';
 import { localize } from '@deriv-com/translations';
 import { botNotification } from '@/components/bot-notification/bot-notification';
+import { load } from '@/external/bot-skeleton';
 
 // ── Bot 1: Matches Top Common ────────────────────────────────────────────────
 const MATCHES_TOP_COMMON_XML = `<xml xmlns="https://developers.google.com/blockly/xml" is_dbot="true" collection="false">
@@ -1647,13 +1648,22 @@ const CustomBots: React.FC<CustomBotsProps> = ({ handleTabChange }) => {
             handleTabChange(1);
 
             // Wait for the workspace DOM container to be visible so Blockly can measure and render blocks correctly
-            setTimeout(() => {
+            setTimeout(async () => {
                 try {
-                    const dom = window.Blockly.utils.xml.textToDom(xmlString);
-                    window.Blockly.Xml.clearWorkspaceAndLoadFromXml(dom, window.Blockly.derivWorkspace);
-                    window.Blockly.derivWorkspace.cleanUp();
-                    window.Blockly.derivWorkspace.clearUndo();
+                    // Use the native DBot skeleton load function
+                    await load({
+                        block_string: xmlString,
+                        strategy_id: 'custom_strategy_bot',
+                        file_name: strategyName,
+                        workspace: window.Blockly.derivWorkspace,
+                        from: 'local',
+                        drop_event: {},
+                        showIncompatibleStrategyDialog: false,
+                        show_snackbar: false, // We show our own clean custom toast
+                    });
                     
+                    window.Blockly.derivWorkspace.strategy_to_load = xmlString;
+
                     // Force Blockly to resize and redraw since it was hidden
                     if (window.Blockly.derivWorkspace) {
                         window.Blockly.svgResize(window.Blockly.derivWorkspace);
