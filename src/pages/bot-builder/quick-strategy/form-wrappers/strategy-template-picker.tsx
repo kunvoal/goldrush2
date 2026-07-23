@@ -63,8 +63,24 @@ const StrategyTemplatePicker = observer(({ setCurrentStep, setSelectedTradeType 
                     value={search_value}
                     size='sm'
                 />
+                <button
+                    className='strategy-template-picker__icon'
+                    onClick={() => {
+                        setActiveTab(DBOT_TABS.TUTORIAL);
+                        setActiveTabTutorial(2);
+                        setFormVisibility(false);
 
-
+                        // Add a small delay to ensure the tab is selected before scrolling
+                        setTimeout(() => {
+                            const tutorialsSection = document.getElementById('id-tutorials');
+                            if (tutorialsSection) {
+                                tutorialsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                        }, 100);
+                    }}
+                >
+                    <LegacyGuide1pxIcon iconSize='sm' />
+                </button>
             </div>
             <div className='strategy-template-picker__chips'>
                 {TRADE_TYPES.map((item, index) => (
