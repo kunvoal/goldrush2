@@ -49,6 +49,16 @@ const MATCHES_TOP_COMMON_XML = `<xml xmlns="https://developers.google.com/blockl
         </next>
       </block>
     </statement>
+    <statement name="INITIALIZATION">
+      <block type="variables_set" id="init_pred_var_1">
+        <field name="VAR" id="var_prediction" variabletype="">prediction</field>
+        <value name="VALUE">
+          <block type="math_number" id="pred_num_init_1">
+            <field name="NUM">5</field>
+          </block>
+        </value>
+      </block>
+    </statement>
     <statement name="SUBMARKET">
       <block type="trade_definition_tradeoptions" id="trade_opts">
         <mutation xmlns="http://www.w3.org/1999/xhtml" has_first_barrier="false" has_second_barrier="false" has_prediction="true"></mutation>
@@ -342,6 +352,16 @@ const BULK_MATCHES_SLT_XML = `<xml xmlns="https://developers.google.com/blockly/
             </next>
           </block>
         </next>
+      </block>
+    </statement>
+    <statement name="INITIALIZATION">
+      <block type="variables_set" id="init_pred_var_2">
+        <field name="VAR" id="var_prediction" variabletype="">prediction</field>
+        <value name="VALUE">
+          <block type="math_number" id="pred_num_init_2">
+            <field name="NUM">5</field>
+          </block>
+        </value>
       </block>
     </statement>
     <statement name="SUBMARKET">
@@ -724,6 +744,16 @@ const COMBO_OV3_UN6_XML = `<xml xmlns="https://developers.google.com/blockly/xml
         </next>
       </block>
     </statement>
+    <statement name="INITIALIZATION">
+      <block type="variables_set" id="init_pred_var_3">
+        <field name="VAR" id="var_prediction" variabletype="">prediction</field>
+        <value name="VALUE">
+          <block type="math_number" id="pred_num_init_3">
+            <field name="NUM">5</field>
+          </block>
+        </value>
+      </block>
+    </statement>
     <statement name="SUBMARKET">
       <block type="trade_definition_tradeoptions" id="trade_opts">
         <mutation xmlns="http://www.w3.org/1999/xhtml" has_first_barrier="false" has_second_barrier="false" has_prediction="true"></mutation>
@@ -825,9 +855,9 @@ const COMBO_OV3_UN6_XML = `<xml xmlns="https://developers.google.com/blockly/xml
                         <field name="NOTIFICATION_TYPE">info</field>
                         <field name="NOTIFICATION_SOUND">silent</field>
                         <value name="MESSAGE">
-                          <block type="text" id="msg_over_text">
+                          <shadow type="text" id="msg_over_text">
                             <field name="TEXT">OV3/UN6 Combo Hedging: Purchasing DIGITOVER 3 (Wins 4-9)</field>
-                          </block>
+                          </shadow>
                         </value>
                         <next>
                           <block type="purchase" id="buy_over_contract">
@@ -861,9 +891,9 @@ const COMBO_OV3_UN6_XML = `<xml xmlns="https://developers.google.com/blockly/xml
                         <field name="NOTIFICATION_TYPE">info</field>
                         <field name="NOTIFICATION_SOUND">silent</field>
                         <value name="MESSAGE">
-                          <block type="text" id="msg_under_text">
+                          <shadow type="text" id="msg_under_text">
                             <field name="TEXT">OV3/UN6 Combo Hedging: Purchasing DIGITUNDER 6 (Wins 0-5)</field>
-                          </block>
+                          </shadow>
                         </value>
                         <next>
                           <block type="purchase" id="buy_under_contract">
@@ -1154,447 +1184,6 @@ const EVEN_ODD_STREAK_XML = `<xml xmlns="https://developers.google.com/blockly/x
   </block>
 </xml>`;
 
-// ── Bot 5: Matches Longest Sleeper ──────────────────────────────────────────
-const LONGEST_SLEEPER_XML = `<xml xmlns="https://developers.google.com/blockly/xml" is_dbot="true" collection="false">
-  <variables>
-    <variable id="var_prediction">prediction</variable>
-    <variable id="var_recent_digits">recent_digits</variable>
-    <variable id="var_target_digit">target_digit</variable>
-    <variable id="var_max_sleep">max_sleep</variable>
-    <variable id="var_d">d</variable>
-    <variable id="var_sleep">sleep</variable>
-    <variable id="var_i">i</variable>
-  </variables>
-  <block type="trade_definition" id="trade_def_sleeper" deletable="false" x="0" y="60">
-    <statement name="TRADE_OPTIONS">
-      <block type="trade_definition_market" id="market_sel" deletable="false" movable="false">
-        <field name="MARKET_LIST">synthetic_index</field>
-        <field name="SUBMARKET_LIST">random_index</field>
-        <field name="SYMBOL_LIST">1HZ100V</field>
-        <next>
-          <block type="trade_definition_tradetype" id="trade_type_sel" deletable="false" movable="false">
-            <field name="TRADETYPECAT_LIST">digits</field>
-            <field name="TRADETYPE_LIST">matchesdiffers</field>
-            <next>
-              <block type="trade_definition_contracttype" id="contract_type_sel" deletable="false" movable="false">
-                <field name="TYPE_LIST">both</field>
-                <next>
-                  <block type="trade_definition_candleinterval" id="candle_sel" deletable="false" movable="false">
-                    <field name="CANDLEINTERVAL_LIST">60</field>
-                    <next>
-                      <block type="trade_definition_restartbuysell" id="restart_sel" deletable="false" movable="false">
-                        <field name="TIME_MACHINE_ENABLED">FALSE</field>
-                        <next>
-                          <block type="trade_definition_restartonerror" id="onerror_sel" deletable="false" movable="false">
-                            <field name="RESTARTONERROR">TRUE</field>
-                          </block>
-                        </next>
-                      </block>
-                    </next>
-                  </block>
-                </next>
-              </block>
-            </next>
-          </block>
-        </next>
-      </block>
-    </statement>
-    <statement name="SUBMARKET">
-      <block type="trade_definition_tradeoptions" id="trade_opts">
-        <mutation xmlns="http://www.w3.org/1999/xhtml" has_first_barrier="false" has_second_barrier="false" has_prediction="true"></mutation>
-        <field name="DURATIONTYPE_LIST">t</field>
-        <value name="DURATION">
-          <shadow type="math_number_positive" id="dur_val">
-            <field name="NUM">1</field>
-          </shadow>
-        </value>
-        <value name="AMOUNT">
-          <shadow type="math_number_positive" id="amount_val">
-            <field name="NUM">1</field>
-          </shadow>
-        </value>
-        <value name="PREDICTION">
-          <block type="variables_get" id="pred_var_get">
-            <field name="VAR" id="var_prediction">prediction</field>
-          </block>
-        </value>
-      </block>
-    </statement>
-  </block>
-  <block type="during_purchase" id="during_purch" x="935" y="60">
-    <statement name="DURING_PURCHASE_STACK">
-      <block type="controls_if" id="check_sell_if">
-        <value name="IF0">
-          <block type="check_sell" id="check_sell_action"></block>
-        </value>
-      </block>
-    </statement>
-  </block>
-  <block type="after_purchase" id="after_purch" x="935" y="292">
-    <statement name="AFTERPURCHASE_STACK">
-      <block type="trade_again" id="trade_again_action"></block>
-    </statement>
-  </block>
-  <block type="before_purchase" id="before_purch" deletable="false" x="23" y="690">
-    <statement name="BEFOREPURCHASE_STACK">
-      <block type="variables_set" id="set_recent_digits">
-        <field name="VAR" id="var_recent_digits">recent_digits</field>
-        <value name="VALUE">
-          <block type="lists_getSublist" id="sublist_recent">
-            <mutation at1="true" at2="false"></mutation>
-            <field name="WHERE1">FROM_END</field>
-            <field name="WHERE2">LAST</field>
-            <value name="LIST">
-              <block type="lastDigitList" id="digit_list_source"></block>
-            </value>
-            <value name="AT1">
-              <block type="math_number" id="slice_size">
-                <field name="NUM">30</field>
-              </block>
-            </value>
-          </block>
-        </value>
-        <next>
-          <!-- Initialize target_digit = 0 and max_sleep = -1 -->
-          <block type="variables_set" id="init_target_digit">
-            <field name="VAR" id="var_target_digit">target_digit</field>
-            <value name="VALUE"><block type="math_number" id="zero_val"><field name="NUM">0</field></block></value>
-            <next>
-              <block type="variables_set" id="init_max_sleep">
-                <field name="VAR" id="var_max_sleep">max_sleep</field>
-                <value name="VALUE"><block type="math_number" id="neg_one_val"><field name="NUM">-1</field></block></value>
-                <next>
-                  <!-- Loop d from 0 to 9 -->
-                  <block type="controls_for" id="loop_digits_0_to_9">
-                    <field name="VAR" id="var_d">d</field>
-                    <value name="FROM"><block type="math_number" id="loop_start"><field name="NUM">0</field></block></value>
-                    <value name="TO"><block type="math_number" id="loop_end"><field name="NUM">9</field></block></value>
-                    <value name="BY"><block type="math_number" id="loop_step"><field name="NUM">1</field></block></value>
-                    <statement name="DO">
-                      <!-- Initialize sleep = 30 (max possible sleep in this window) -->
-                      <block type="variables_set" id="init_sleep">
-                        <field name="VAR" id="var_sleep">sleep</field>
-                        <value name="VALUE"><block type="math_number" id="sleep_max_val"><field name="NUM">30</field></block></value>
-                        <next>
-                          <!-- Loop i from 1 to 30 to search backwards -->
-                          <block type="controls_for" id="loop_backwards">
-                            <field name="VAR" id="var_i">i</field>
-                            <value name="FROM"><block type="math_number" id="idx_start"><field name="NUM">1</field></block></value>
-                            <value name="TO"><block type="math_number" id="idx_end"><field name="NUM">30</field></block></value>
-                            <value name="BY"><block type="math_number" id="idx_step"><field name="NUM">1</field></block></value>
-                            <statement name="DO">
-                              <block type="controls_if" id="check_digit_occur">
-                                <value name="IF0">
-                                  <block type="logic_compare" id="compare_dig">
-                                    <field name="OP">EQ</field>
-                                    <value name="A">
-                                      <block type="lists_getIndex" id="get_dig_at">
-                                        <mutation statement="false" at="true"></mutation>
-                                        <field name="MODE">GET</field>
-                                        <field name="WHERE">FROM_END</field>
-                                        <value name="VALUE"><block type="variables_get" id="rd_source"><field name="VAR" id="var_recent_digits">recent_digits</field></block></value>
-                                        <value name="AT"><block type="variables_get" id="i_val"><field name="VAR" id="var_i">i</field></block></value>
-                                      </block>
-                                    </value>
-                                    <value name="B"><block type="variables_get" id="d_val"><field name="VAR" id="var_d">d</field></block></value>
-                                  </block>
-                                </value>
-                                <statement name="DO0">
-                                  <block type="variables_set" id="set_sleep_found">
-                                    <field name="VAR" id="var_sleep">sleep</field>
-                                    <value name="VALUE">
-                                      <block type="math_arithmetic" id="calc_sleep">
-                                        <field name="OP">MINUS</field>
-                                        <value name="A"><block type="variables_get" id="get_i"><field name="VAR" id="var_i">i</field></block></value>
-                                        <value name="B"><block type="math_number" id="one_num"><field name="NUM">1</field></block></value>
-                                      </block>
-                                    </value>
-                                    <next>
-                                      <!-- Break loop by setting i = 30 -->
-                                      <block type="variables_set" id="break_loop">
-                                        <field name="VAR" id="var_i">i</field>
-                                        <value name="VALUE"><block type="math_number" id="thirty_num"><field name="NUM">30</field></block></value>
-                                      </block>
-                                    </next>
-                                  </block>
-                                </statement>
-                              </block>
-                            </statement>
-                            <next>
-                              <!-- If sleep > max_sleep, update target -->
-                              <block type="controls_if" id="check_new_sleep_max">
-                                <value name="IF0">
-                                  <block type="logic_compare" id="compare_sleep">
-                                    <field name="OP">GT</field>
-                                    <value name="A"><block type="variables_get" id="get_sleep"><field name="VAR" id="var_sleep">sleep</field></block></value>
-                                    <value name="B"><block type="variables_get" id="get_max_sleep"><field name="VAR" id="var_max_sleep">max_sleep</field></block></value>
-                                  </block>
-                                </value>
-                                <statement name="DO0">
-                                  <block type="variables_set" id="set_new_max_sleep">
-                                    <field name="VAR" id="var_max_sleep">max_sleep</field>
-                                    <value name="VALUE"><block type="variables_get" id="get_sleep_val"><field name="VAR" id="var_sleep">sleep</field></block></value>
-                                    <next>
-                                      <block type="variables_set" id="set_new_target_digit">
-                                        <field name="VAR" id="var_target_digit">target_digit</field>
-                                        <value name="VALUE"><block type="variables_get" id="get_d"><field name="VAR" id="var_d">d</field></block></value>
-                                      </block>
-                                    </next>
-                                  </block>
-                                </statement>
-                              </block>
-                            </next>
-                          </block>
-                        </next>
-                      </block>
-                    </statement>
-                    <next>
-                      <!-- Apply target digit prediction -->
-                      <block type="variables_set" id="apply_pred">
-                        <field name="VAR" id="var_prediction">prediction</field>
-                        <value name="VALUE"><block type="variables_get" id="get_final_target"><field name="VAR" id="var_target_digit">target_digit</field></block></value>
-                        <next>
-                          <block type="notify" id="notify_sleeper">
-                            <field name="NOTIFICATION_TYPE">success</field>
-                            <field name="NOTIFICATION_SOUND">silent</field>
-                            <value name="MESSAGE">
-                              <block type="text_join" id="join_msg">
-                                <mutation items="4"></mutation>
-                                <value name="ADD0"><block type="text" id="t1"><field name="TEXT">Sleeper Matches Target: </field></block></value>
-                                <value name="ADD1"><block type="variables_get" id="gt"><field name="VAR" id="var_target_digit">target_digit</field></block></value>
-                                <value name="ADD2"><block type="text" id="t2"><field name="TEXT"> (Slept: </field></block></value>
-                                <value name="ADD3"><block type="variables_get" id="gms"><field name="VAR" id="var_max_sleep">max_sleep</field></block></value>
-                              </block>
-                            </value>
-                            <next>
-                              <block type="purchase" id="buy_sleeper">
-                                <field name="PURCHASE_LIST">DIGITMATCH</field>
-                              </block>
-                            </next>
-                          </block>
-                        </next>
-                      </block>
-                    </next>
-                  </block>
-                </next>
-              </block>
-            </next>
-          </block>
-        </next>
-      </block>
-    </statement>
-  </block>
-</xml>`;
-
-// ── Bot 6: Over 4 Trend Follower ─────────────────────────────────────────────
-const OVER_4_TREND_XML = `<xml xmlns="https://developers.google.com/blockly/xml" is_dbot="true" collection="false">
-  <variables>
-    <variable id="var_prediction">prediction</variable>
-    <variable id="var_recent_digits">recent_digits</variable>
-    <variable id="var_over_count">over_count</variable>
-    <variable id="var_i">i</variable>
-    <variable id="var_digit">digit</variable>
-  </variables>
-  <block type="trade_definition" id="trade_def_trend" deletable="false" x="0" y="60">
-    <statement name="TRADE_OPTIONS">
-      <block type="trade_definition_market" id="market_sel" deletable="false" movable="false">
-        <field name="MARKET_LIST">synthetic_index</field>
-        <field name="SUBMARKET_LIST">random_index</field>
-        <field name="SYMBOL_LIST">1HZ100V</field>
-        <next>
-          <block type="trade_definition_tradetype" id="trade_type_sel" deletable="false" movable="false">
-            <field name="TRADETYPECAT_LIST">digits</field>
-            <field name="TRADETYPE_LIST">overunder</field>
-            <next>
-              <block type="trade_definition_contracttype" id="contract_type_sel" deletable="false" movable="false">
-                <field name="TYPE_LIST">both</field>
-                <next>
-                  <block type="trade_definition_candleinterval" id="candle_sel" deletable="false" movable="false">
-                    <field name="CANDLEINTERVAL_LIST">60</field>
-                    <next>
-                      <block type="trade_definition_restartbuysell" id="restart_sel" deletable="false" movable="false">
-                        <field name="TIME_MACHINE_ENABLED">FALSE</field>
-                        <next>
-                          <block type="trade_definition_restartonerror" id="onerror_sel" deletable="false" movable="false">
-                            <field name="RESTARTONERROR">TRUE</field>
-                          </block>
-                        </next>
-                      </block>
-                    </next>
-                  </block>
-                </next>
-              </block>
-            </next>
-          </block>
-        </next>
-      </block>
-    </statement>
-    <statement name="SUBMARKET">
-      <block type="trade_definition_tradeoptions" id="trade_opts">
-        <mutation xmlns="http://www.w3.org/1999/xhtml" has_first_barrier="false" has_second_barrier="false" has_prediction="true"></mutation>
-        <field name="DURATIONTYPE_LIST">t</field>
-        <value name="DURATION">
-          <shadow type="math_number_positive" id="dur_val">
-            <field name="NUM">1</field>
-          </shadow>
-        </value>
-        <value name="AMOUNT">
-          <shadow type="math_number_positive" id="amount_val">
-            <field name="NUM">1</field>
-          </shadow>
-        </value>
-        <value name="PREDICTION">
-          <block type="variables_get" id="pred_var_get">
-            <field name="VAR" id="var_prediction">prediction</field>
-          </block>
-        </value>
-      </block>
-    </statement>
-  </block>
-  <block type="during_purchase" id="during_purch" x="935" y="60">
-    <statement name="DURING_PURCHASE_STACK">
-      <block type="controls_if" id="check_sell_if">
-        <value name="IF0">
-          <block type="check_sell" id="check_sell_action"></block>
-        </value>
-      </block>
-    </statement>
-  </block>
-  <block type="after_purchase" id="after_purch" x="935" y="292">
-    <statement name="AFTERPURCHASE_STACK">
-      <block type="trade_again" id="trade_again_action"></block>
-    </statement>
-  </block>
-  <block type="before_purchase" id="before_purch" deletable="false" x="23" y="690">
-    <statement name="BEFOREPURCHASE_STACK">
-      <!-- Force prediction = 4 -->
-      <block type="variables_set" id="force_pred_4">
-        <field name="VAR" id="var_prediction">prediction</field>
-        <value name="VALUE"><block type="math_number" id="four_num"><field name="NUM">4</field></block></value>
-        <next>
-          <!-- Slice lastDigitList to last 10 elements -->
-          <block type="variables_set" id="set_recent_digits">
-            <field name="VAR" id="var_recent_digits">recent_digits</field>
-            <value name="VALUE">
-              <block type="lists_getSublist" id="sublist_recent">
-                <mutation at1="true" at2="false"></mutation>
-                <field name="WHERE1">FROM_END</field>
-                <field name="WHERE2">LAST</field>
-                <value name="LIST">
-                  <block type="lastDigitList" id="digit_list_source"></block>
-                </value>
-                <value name="AT1">
-                  <block type="math_number" id="slice_size">
-                    <field name="NUM">10</field>
-                  </block>
-                </value>
-              </block>
-            </value>
-            <next>
-              <!-- Initialize over_count = 0 -->
-              <block type="variables_set" id="init_over_count">
-                <field name="VAR" id="var_over_count">over_count</field>
-                <value name="VALUE"><block type="math_number" id="zero_count"><field name="NUM">0</field></block></value>
-                <next>
-                  <!-- Loop digit in recent_digits -->
-                  <block type="controls_forEach" id="loop_recent">
-                    <field name="VAR" id="var_digit">digit</field>
-                    <value name="LIST"><block type="variables_get" id="get_list"><field name="VAR" id="var_recent_digits">recent_digits</field></block></value>
-                    <statement name="DO">
-                      <!-- If digit > 4, increment over_count -->
-                      <block type="controls_if" id="check_is_over">
-                        <value name="IF0">
-                          <block type="logic_compare" id="compare_over">
-                            <field name="OP">GT</field>
-                            <value name="A"><block type="variables_get" id="get_digit"><field name="VAR" id="var_digit">digit</field></block></value>
-                            <value name="B"><block type="math_number" id="compare_four"><field name="NUM">4</field></block></value>
-                          </block>
-                        </value>
-                        <statement name="DO0">
-                          <block type="variables_set" id="increment_over">
-                            <field name="VAR" id="var_over_count">over_count</field>
-                            <value name="VALUE">
-                              <block type="math_arithmetic" id="add_one">
-                                <field name="OP">ADD</field>
-                                <value name="A"><block type="variables_get" id="get_over_count"><field name="VAR" id="var_over_count">over_count</field></block></value>
-                                <value name="B"><block type="math_number" id="one_val"><field name="NUM">1</field></block></value>
-                              </block>
-                            </value>
-                          </block>
-                        </statement>
-                      </block>
-                    </statement>
-                    <next>
-                      <!-- Trend decisions -->
-                      <block type="controls_if" id="trend_action">
-                        <mutation xmlns="http://www.w3.org/1999/xhtml" else="1"></mutation>
-                        <value name="IF0">
-                          <block type="logic_compare" id="check_uptrend">
-                            <field name="OP">GTE</field>
-                            <value name="A"><block type="variables_get" id="get_over_total"><field name="VAR" id="var_over_count">over_count</field></block></value>
-                            <value name="B"><block type="math_number" id="uptrend_threshold"><field name="NUM">6</field></block></value>
-                          </block>
-                        </value>
-                        <statement name="DO0">
-                          <block type="notify" id="notify_over">
-                            <field name="NOTIFICATION_TYPE">info</field>
-                            <field name="NOTIFICATION_SOUND">silent</field>
-                            <value name="MESSAGE">
-                              <block type="text_join" id="join_msg_over">
-                                <mutation items="2"></mutation>
-                                <value name="ADD0"><block type="text" id="t1"><field name="TEXT">Uptrend Detected (Over Count: </field></block></value>
-                                <value name="ADD1"><block type="variables_get" id="gt1"><field name="VAR" id="var_over_count">over_count</field></block></value>
-                              </block>
-                            </value>
-                            <next>
-                              <block type="purchase" id="buy_over">
-                                <field name="PURCHASE_LIST">DIGITOVER</field>
-                              </block>
-                            </next>
-                          </block>
-                        </statement>
-                        <statement name="ELSE">
-                          <block type="controls_if" id="check_downtrend_if">
-                            <value name="IF0">
-                              <block type="logic_compare" id="check_downtrend">
-                                <field name="OP">LTE</field>
-                                <value name="A"><block type="variables_get" id="get_under_total"><field name="VAR" id="var_over_count">over_count</field></block></value>
-                                <value name="B"><block type="math_number" id="downtrend_threshold"><field name="NUM">4</field></block></value>
-                              </block>
-                            </value>
-                            <statement name="DO0">
-                              <block type="notify" id="notify_under">
-                                <field name="NOTIFICATION_TYPE">info</field>
-                                <field name="NOTIFICATION_SOUND">silent</field>
-                                <value name="MESSAGE">
-                                  <block type="text_join" id="join_msg_under">
-                                    <mutation items="2"></mutation>
-                                    <value name="ADD0"><block type="text" id="t2"><field name="TEXT">Downtrend Detected (Over Count: </field></block></value>
-                                    <value name="ADD1"><block type="variables_get" id="gt2"><field name="VAR" id="var_over_count">over_count</field></block></value>
-                                  </block>
-                                </value>
-                                <next>
-                                  <block type="purchase" id="buy_under">
-                                    <field name="PURCHASE_LIST">DIGITUNDER</field>
-                                  </block>
-                                </next>
-                              </block>
-                            </statement>
-                          </block>
-                        </statement>
-                      </block>
-                    </next>
-                  </block>
-                </next>
-              </block>
-            </next>
-          </block>
-        </next>
-      </block>
-    </statement>
-  </block>
-</xml>`;
-
 const strategies = [
     {
         name: 'Matches Top Common',
@@ -1615,16 +1204,6 @@ const strategies = [
         name: 'Even/Odd Streak mean-reverter',
         description: 'Trades against 3+ odd/even streaks',
         xml: EVEN_ODD_STREAK_XML,
-    },
-    {
-        name: 'Matches Longest Sleeper',
-        description: 'Targets longest dormant digit',
-        xml: LONGEST_SLEEPER_XML,
-    },
-    {
-        name: 'Over 4 Trend Follower',
-        description: 'Follows over/under 4 tick bias',
-        xml: OVER_4_TREND_XML,
     },
 ];
 
