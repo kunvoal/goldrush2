@@ -21,6 +21,7 @@ const AppHeader = observer(() => {
     const { isAuthorizing, activeLoginid, setIsAuthorizing, authData } = useApiBase();
     const { client } = useStore() ?? {};
     const [authTimeout, setAuthTimeout] = useState(false);
+    const [isAuthMenuOpen, setIsAuthMenuOpen] = useState(false);
     const is_account_regenerating = client?.is_account_regenerating || false;
 
     // Detect OAuth callback on mount (before App.tsx cleans up the URL).
@@ -174,9 +175,9 @@ const AppHeader = observer(() => {
                 // URL") never fire. The env-not-set toast explains why.
                 const isAuthConfigured = Boolean(process.env.NEXT_PUBLIC_DERIV_APP_ID);
                 return (
-                    <div className='auth-actions'>
+                    <div className='auth-actions' style={{ position: 'relative' }}>
                         <button
-                            onClick={handleLogin}
+                            onClick={() => setIsAuthMenuOpen(!isAuthMenuOpen)}
                             disabled={!isAuthConfigured}
                             style={{
                                 display: 'flex',
@@ -198,6 +199,84 @@ const AppHeader = observer(() => {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                         </button>
+                        {isAuthMenuOpen && (
+                            <>
+                                <div 
+                                    onClick={() => setIsAuthMenuOpen(false)}
+                                    style={{
+                                        position: 'fixed',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        zIndex: 9998,
+                                        background: 'transparent'
+                                    }}
+                                />
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '38px',
+                                    right: 0,
+                                    width: '160px',
+                                    background: 'var(--general-main-1, #15171c)',
+                                    border: '1px solid var(--border-normal, rgba(255, 255, 255, 0.15))',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+                                    padding: '6px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '4px',
+                                    zIndex: 9999
+                                }}>
+                                    <button
+                                        onClick={() => {
+                                            setIsAuthMenuOpen(false);
+                                            handleLogin();
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            textAlign: 'left',
+                                            padding: '8px 12px',
+                                            background: 'transparent',
+                                            border: 'none',
+                                            color: 'var(--text-general, #ffffff)',
+                                            fontSize: '12px',
+                                            fontWeight: 'bold',
+                                            cursor: 'pointer',
+                                            borderRadius: '4px',
+                                            transition: 'background 0.2s'
+                                        }}
+                                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'}
+                                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        <Localize i18n_default_text='Log In' />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setIsAuthMenuOpen(false);
+                                            handleSignup();
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            textAlign: 'left',
+                                            padding: '8px 12px',
+                                            background: 'transparent',
+                                            border: 'none',
+                                            color: 'var(--text-general, #ffffff)',
+                                            fontSize: '12px',
+                                            fontWeight: 'bold',
+                                            cursor: 'pointer',
+                                            borderRadius: '4px',
+                                            transition: 'background 0.2s'
+                                        }}
+                                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'}
+                                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        <Localize i18n_default_text='Sign Up' />
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 );
             }
