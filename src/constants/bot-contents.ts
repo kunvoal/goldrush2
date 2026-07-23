@@ -12,13 +12,13 @@ export const tabs_title: TTabsTitle = Object.freeze({
 });
 
 export const DBOT_TABS: TDashboardTabIndex = Object.freeze({
-    BOT_BUILDER: 0,
-    CUSTOM_BOTS: 1,
+    CUSTOM_BOTS: 0,
+    BOT_BUILDER: 1,
     CHART: 2,
 });
 
 export const MAX_STRATEGIES = 10;
 
-export const TAB_IDS = ['id-bot-builder', 'id-custom-bots', 'id-charts'];
+export const TAB_IDS = ['id-custom-bots', 'id-bot-builder', 'id-charts'];
 
 export const DEBOUNCE_INTERVAL_TIME = 500;

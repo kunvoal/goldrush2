@@ -79,7 +79,7 @@ const AppWrapper = observer(() => {
     const { clear } = summary_card;
     const { BOT_BUILDER } = DBOT_TABS;
     const init_render = React.useRef(true);
-    const hash = ['bot_builder', 'custom_bots', 'chart'];
+    const hash = ['custom_bots', 'bot_builder', 'chart'];
     const { isDesktop } = useDevice();
     const location = useLocation();
     const navigate = useNavigate();
@@ -403,19 +403,6 @@ const AppWrapper = observer(() => {
                                             width='24px'
                                             fill='var(--text-general)'
                                         />
-                                        <Localize i18n_default_text='Bot Builder' />
-                                    </>
-                                }
-                                id='id-bot-builder'
-                            />
-                            <div
-                                label={
-                                    <>
-                                        <LabelPairedPuzzlePieceTwoCaptionBoldIcon
-                                            height='24px'
-                                            width='24px'
-                                            fill='var(--text-general)'
-                                        />
                                         <Localize i18n_default_text='Quick Strategies' />
                                     </>
                                 }
@@ -427,6 +414,19 @@ const AppWrapper = observer(() => {
                                     <CustomBots handleTabChange={handleTabChange} />
                                 </Suspense>
                             </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedPuzzlePieceTwoCaptionBoldIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Bot Builder' />
+                                    </>
+                                }
+                                id='id-bot-builder'
+                            />
                             <div
                                 label={
                                     <>

@@ -1597,45 +1597,33 @@ const OVER_4_TREND_XML = `<xml xmlns="https://developers.google.com/blockly/xml"
 const strategies = [
     {
         name: 'Matches Top Common',
-        description: 'Targets the single most common digit utilizing DIGITMATCH contracts.',
+        description: 'Targets single most common digit',
         xml: MATCHES_TOP_COMMON_XML,
-        badge: '9.0x Payout',
-        badgeColor: '#00c853',
     },
     {
         name: 'Bulk Matches Top Common SLT',
-        description: 'Analyzes frequencies to target top 2 common digits, alternating purchases.',
+        description: 'Alternates top 2 common digits',
         xml: BULK_MATCHES_SLT_XML,
-        badge: '9.0x Alternate',
-        badgeColor: '#ff9100',
     },
     {
         name: 'Combo OV3 / UN6 Hedger',
-        description: '100% mathematical hedge alternating Over 3 and Under 6 contracts.',
+        description: 'Alternates Over 3 / Under 6 hedge',
         xml: COMBO_OV3_UN6_XML,
-        badge: 'Nominal Hedge',
-        badgeColor: '#2979ff',
     },
     {
         name: 'Even/Odd Streak mean-reverter',
-        description: 'Mean-reverts against 3+ consecutive odd or even digit streak patterns.',
+        description: 'Trades against 3+ odd/even streaks',
         xml: EVEN_ODD_STREAK_XML,
-        badge: 'Streak Revert',
-        badgeColor: '#e040fb',
     },
     {
         name: 'Matches Longest Sleeper',
-        description: 'Scans history to target the single longest dormant sleeper digit.',
+        description: 'Targets longest dormant digit',
         xml: LONGEST_SLEEPER_XML,
-        badge: 'Matches SLT',
-        badgeColor: '#00e5ff',
     },
     {
         name: 'Over 4 Trend Follower',
-        description: 'Locks barrier 4, entering Over/Under based on recent tick bias.',
+        description: 'Follows over/under 4 tick bias',
         xml: OVER_4_TREND_XML,
-        badge: 'Trend Follow',
-        badgeColor: '#ffea00',
     },
 ];
 
@@ -1667,8 +1655,8 @@ const CustomBots: React.FC<CustomBotsProps> = ({ handleTabChange }) => {
                 { type: 'success' }
             );
             
-            // Switch back to Bot Builder tab (index 0 now)
-            handleTabChange(0);
+            // Switch back to Bot Builder tab (index 1 now)
+            handleTabChange(1);
         } catch (error) {
             console.error('Failed to load XML strategy:', error);
             botNotification(
@@ -1690,92 +1678,56 @@ const CustomBots: React.FC<CustomBotsProps> = ({ handleTabChange }) => {
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '12px'
+                gap: '8px'
             }}>
                 {strategies.map((strat, idx) => (
                     <div 
                         key={idx} 
                         onClick={() => loadStrategy(strat.xml, strat.name)}
                         style={{
-                            background: 'rgba(255, 255, 255, 0.03)',
-                            border: '1px solid rgba(255, 255, 255, 0.08)',
-                            borderRadius: '8px',
-                            padding: '12px 16px',
+                            background: 'rgba(255, 255, 255, 0.02)',
+                            border: '1px solid rgba(255, 255, 255, 0.05)',
+                            borderRadius: '4px',
+                            padding: '0 16px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            height: '75px', // Exact height under 2cm (~76px)
+                            height: '38px', // Exact height ~1cm (38px)
                             cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
+                            transition: 'all 0.15s ease',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                             backdropFilter: 'blur(8px)',
                             WebkitBackdropFilter: 'blur(8px)'
                         }}
                         onMouseOver={(e) => {
-                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
-                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
                         }}
                         onMouseOut={(e) => {
-                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
+                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.05)';
                         }}
                     >
-                        <div style={{ flex: 1, minWidth: 0, paddingRight: '16px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                <h3 style={{
-                                    fontSize: '14px',
-                                    fontWeight: 700,
-                                    color: 'var(--text-general)',
-                                    margin: 0
-                                }}>
-                                    {localize(strat.name)}
-                                </h3>
-                                <span style={{
-                                    background: strat.badgeColor,
-                                    color: '#000000',
-                                    fontSize: '9px',
-                                    fontWeight: 'bold',
-                                    padding: '2px 6px',
-                                    borderRadius: '4px',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.3px',
-                                    lineHeight: '1'
-                                }}>
-                                    {strat.badge}
-                                </span>
-                            </div>
-                            <p style={{
-                                fontSize: '11px',
-                                color: 'var(--text-less-prominent)',
-                                margin: 0,
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                            }}>
-                                {localize(strat.description)}
-                            </p>
-                        </div>
-                        <button
-                            style={{
-                                width: '32px',
-                                height: '32px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                background: 'linear-gradient(135deg, #e61938 0%, #a8001e 100%)',
-                                color: '#ffffff',
-                                border: 'none',
-                                borderRadius: '50%',
-                                cursor: 'pointer',
-                                boxShadow: '0 2px 8px rgba(230, 25, 56, 0.3)',
-                                fontSize: '14px',
-                                flexShrink: 0
-                            }}
-                        >
-                            ⚡
-                        </button>
+                        <span style={{
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            color: 'var(--text-general)',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                        }}>
+                            {localize(strat.name)}
+                        </span>
+                        <span style={{
+                            fontSize: '11px',
+                            color: 'var(--text-less-prominent)',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            paddingLeft: '16px'
+                        }}>
+                            {localize(strat.description)}
+                        </span>
                     </div>
                 ))}
             </div>
