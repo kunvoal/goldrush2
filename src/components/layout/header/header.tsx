@@ -173,6 +173,7 @@ const AppHeader = observer(() => {
                 // click handlers (which would otherwise log "Failed to generate OAuth
                 // URL") never fire. The env-not-set toast explains why.
                 const isAuthConfigured = Boolean(process.env.NEXT_PUBLIC_DERIV_APP_ID);
+                return (
                     <div className='auth-actions'>
                         <Button tertiary disabled={!isAuthConfigured} onClick={handleLogin}>
                             <Localize i18n_default_text='Log in' />
@@ -181,6 +182,7 @@ const AppHeader = observer(() => {
                             <Localize i18n_default_text='Sign up' />
                         </Button>
                     </div>
+                );
             }
             // Default: Show spinner during loading states or when authorizing
             else if (position === 'right') {

@@ -1643,20 +1643,36 @@ const CustomBots: React.FC<CustomBotsProps> = ({ handleTabChange }) => {
         }
 
         try {
-            // FIXED: Using window.Blockly.utils.xml.textToDom as required by Deriv DBot custom parser
-            const dom = window.Blockly.utils.xml.textToDom(xmlString);
-            window.Blockly.Xml.clearWorkspaceAndLoadFromXml(dom, window.Blockly.derivWorkspace);
-            window.Blockly.derivWorkspace.cleanUp();
-            window.Blockly.derivWorkspace.clearUndo();
-            
-            botNotification(
-                localize(`Successfully loaded "${strategyName}" strategy into Bot Builder!`),
-                undefined,
-                { type: 'success' }
-            );
-            
-            // Switch back to Bot Builder tab (index 1 now)
+            // First switch tab to Bot Builder (index 1) to make it display: block and visible
             handleTabChange(1);
+
+            // Wait for the workspace DOM container to be visible so Blockly can measure and render blocks correctly
+            setTimeout(() => {
+                try {
+                    const dom = window.Blockly.utils.xml.textToDom(xmlString);
+                    window.Blockly.Xml.clearWorkspaceAndLoadFromXml(dom, window.Blockly.derivWorkspace);
+                    window.Blockly.derivWorkspace.cleanUp();
+                    window.Blockly.derivWorkspace.clearUndo();
+                    
+                    // Force Blockly to resize and redraw since it was hidden
+                    if (window.Blockly.derivWorkspace) {
+                        window.Blockly.svgResize(window.Blockly.derivWorkspace);
+                    }
+                    
+                    botNotification(
+                        localize(`Successfully loaded "${strategyName}" strategy into Bot Builder!`),
+                        undefined,
+                        { type: 'success' }
+                    );
+                } catch (loadError) {
+                    console.error('Failed to parse and load XML:', loadError);
+                    botNotification(
+                        localize('Failed to load strategy blocks. Please try again.'),
+                        undefined,
+                        { type: 'error' }
+                    );
+                }
+            }, 100);
         } catch (error) {
             console.error('Failed to load XML strategy:', error);
             botNotification(
