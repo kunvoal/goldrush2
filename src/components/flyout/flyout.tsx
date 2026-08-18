@@ -12,9 +12,10 @@ import { localize } from '@deriv-com/translations';
 import { getPlatformConfig } from '../shared';
 import Input from '../shared_ui/input';
 import Text from '../shared_ui/text';
-import ThemedScrollbars from '../shared_ui/themed-scrollbars';
 import FlyoutBlockGroup from './flyout-block-group';
 import HelpBase from './help-contents';
+import { FireCanvasOverlay } from '@/components/fire-canvas-overlay/fire-canvas-overlay';
+import { FireSvgOverlay } from '@/components/fire-svg-overlay/fire-svg-overlay';
 
 type TSearchResult = {
     search_term: string;
@@ -238,8 +239,10 @@ const Flyout = observer(() => {
                     flyout__help: is_help_content,
                     flyout__normal: !is_help_content && !is_search_flyout,
                 })}
-                style={{ width: `${flyout_width}px` }}
+                style={{ width: `${flyout_width}px`, position: 'relative' }}
             >
+                <FireSvgOverlay />
+                <FireCanvasOverlay opacity={0.8} />
                 {is_search_flyout && !is_help_content && (
                     <SearchResult search_term={search_term} total_result={total_result} />
                 )}

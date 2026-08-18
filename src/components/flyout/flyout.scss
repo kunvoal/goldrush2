@@ -19,7 +19,10 @@
     position: absolute;
     inset-inline-start: 250px;
     top: 0;
-    background-color: var(--general-main-2);
+    background-color: rgba(20, 2, 0, 0.6) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 2px solid #ff4500 !important;
+    box-shadow: 0 0 40px rgba(255, 68, 0, 0.95), inset 0 0 20px rgba(255, 170, 0, 0.4) !important;
     height: calc(100vh - 232px);
     max-height: calc(100vh - 232px);
     z-index: 11;
@@ -27,7 +30,6 @@
     font-size: 2em;
     margin-inline-start: $default-margin;
     margin-top: 20px;
-    box-shadow: 0 2px 8px 0 var(--shadow-box);
     min-width: 400px;
     visibility: hidden;
 

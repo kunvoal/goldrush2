@@ -65,17 +65,10 @@
         }
 
         .dc-tabs {
-            &__active-line {
-                background-color: var(--general-main-1);
-                transition: none;
-            }
-
-            &__active {
-                background: var(--general-main-1);
-            }
-
             &__list {
-                background: var(--general-section-1);
+                background: linear-gradient(90deg, #1c0200 0%, #3d0800 50%, #1c0200 100%) !important;
+                border-bottom: 2px solid #ff4500 !important;
+                box-shadow: 0 4px 20px rgba(255, 68, 0, 0.5) !important;
                 justify-content: start;
 
                 @include mobile-or-tablet-screen {
@@ -107,6 +100,39 @@
                     }
                 }
             }
+
+            &__item {
+                color: #ffc266 !important;
+                font-weight: 800 !important;
+                transition: all 0.25s ease-in-out !important;
+
+                &:hover {
+                    color: #ffffff !important;
+                    text-shadow: 0 0 10px #ff5500 !important;
+                }
+            }
+
+            &__active {
+                background: linear-gradient(180deg, #ff1a00 0%, #ff7700 100%) !important;
+                color: #ffffff !important;
+                font-weight: 900 !important;
+                box-shadow: 0 0 22px rgba(255, 100, 0, 0.95), inset 0 0 12px rgba(255, 230, 0, 0.7) !important;
+                border-top-left-radius: 8px !important;
+                border-top-right-radius: 8px !important;
+                text-shadow: 0 0 8px #ffffff, 0 0 15px #ffff00 !important;
+
+                svg {
+                    fill: #ffffff !important;
+                    filter: drop-shadow(0 0 6px #ffff00) !important;
+                }
+            }
+
+            &__active-line {
+                background: #ffcc00 !important;
+                height: 3px !important;
+                box-shadow: 0 0 12px #ffcc00 !important;
+            }
+        }
 
             &__content {
                 @include mobile-or-tablet-screen {
@@ -174,7 +200,6 @@
                 }
             }
         }
-    }
 
     &__run-strategy-wrapper {
         inset-inline-end: 1.6rem;

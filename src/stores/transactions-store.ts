@@ -1,5 +1,6 @@
 // @ts-nocheck — vendored bot code with known upstream type gaps; see AGENTS.md
 import { action, computed, makeObservable, observable, reaction } from 'mobx';
+import { botNotification } from '@/components/bot-notification/bot-notification';
 import { formatDate, isEnded } from '@/components/shared';
 import { LogTypes } from '@/external/bot-skeleton';
 import { ProposalOpenContract } from '@deriv/api-types';
@@ -63,11 +64,18 @@ export default class TransactionsStore {
 
     get statistics() {
         let total_runs = 0;
+        let running_profit = 0;
+        let lowest_profit_floor = 0;
+
         // Filter out only contract transactions and remove dividers
         const trxs = this.transactions.filter(
             trx => trx.type === transaction_elements.CONTRACT && typeof trx.data === 'object'
         );
-        const statistics = trxs.reduce(
+
+        // Process in chronological order (oldest to newest) to track P/L trajectory
+        const sortedTrxs = [...trxs].reverse();
+
+        const statistics = sortedTrxs.reduce(
             (stats, { data }) => {
                 const contract = data as TContractInfo;
                 const profit = Number(contract.profit) || 0;
@@ -85,6 +93,10 @@ export default class TransactionsStore {
                     }
                     stats.total_profit += profit;
                     stats.total_stake += buy_price;
+                    running_profit += profit;
+                    if (running_profit < lowest_profit_floor) {
+                        lowest_profit_floor = running_profit;
+                    }
                     total_runs += 1;
                 }
                 return stats;
@@ -96,9 +108,11 @@ export default class TransactionsStore {
                 total_payout: 0,
                 total_stake: 0,
                 won_contracts: 0,
+                max_drawdown: 0,
             }
         );
         statistics.number_of_runs = total_runs;
+        statistics.max_drawdown = lowest_profit_floor;
         return statistics;
     }
 
@@ -142,6 +156,8 @@ export default class TransactionsStore {
                 c.data.transaction_ids.buy === data.transaction_ids?.buy
             );
         });
+
+        // Win popup notification removed per user request
 
         if (same_contract_index === -1) {
             // Render a divider if the "run_id" for this contract is different.

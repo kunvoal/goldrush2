@@ -32,3 +32,25 @@
     touch-action: none;
     overflow: hidden;
 }
+
+.toolbar__group {
+    background: rgba(25, 3, 0, 0.92) !important;
+    border: 1.5px solid #ff4500 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 0 20px rgba(255, 68, 0, 0.7), inset 0 0 10px rgba(255, 150, 0, 0.3) !important;
+}
+
+.toolbar__btn {
+    border-radius: 6px !important;
+    transition: all 0.2s ease-in-out !important;
+
+    &:hover {
+        background: linear-gradient(90deg, #ff1a00, #ff7700) !important;
+        box-shadow: 0 0 15px rgba(255, 100, 0, 0.9) !important;
+
+        svg {
+            fill: #ffffff !important;
+            filter: drop-shadow(0 0 5px #ffff00) !important;
+        }
+    }
+}

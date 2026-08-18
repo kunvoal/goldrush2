@@ -407,6 +407,9 @@ const getAllRequiredBlocks = (workspace, required_block_types) => {
 
 const getMissingBlocks = (workspace, required_block_types) => {
     return required_block_types.filter(blockType => {
+        if (blockType === 'purchase') {
+            return !workspace.getAllBlocks().some(block => block.type === 'purchase' || block.type === 'bulk_purchase' || block.type === 'over_under_combo_bulk');
+        }
         return !workspace.getAllBlocks().some(block => block.type === blockType);
     });
 };
@@ -417,10 +420,10 @@ const getDisabledBlocks = required_blocks_check => {
     const disabled_blocks = Object.fromEntries(
         workspace
             .getAllBlocks()
-            .filter(block => required_block_types.includes(block.type))
+            .filter(block => required_block_types.includes(block.type) || block.type === 'bulk_purchase' || block.type === 'over_under_combo_bulk')
             .map(block => [block.type, block.disabled])
     );
-    const mandatory_blocks = ['before_purchase', 'purchase', 'trade_definition', 'trade_definition_tradeoptions'];
+    const mandatory_blocks = ['before_purchase', 'purchase', 'bulk_purchase', 'over_under_combo_bulk', 'trade_definition', 'trade_definition_tradeoptions'];
     const has_disabled_blocks = mandatory_blocks.some(type => disabled_blocks[type]);
 
     return has_disabled_blocks

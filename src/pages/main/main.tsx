@@ -42,10 +42,9 @@ import RunPanel from '../../components/run-panel';
 import ChartModal from '../chart/chart-modal';
 import Dashboard from '../dashboard';
 import RunStrategy from '../dashboard/run-strategy';
-import './main.scss';
+import DraggableChartOverlay from '../../components/draggable-chart/draggable-chart';
+import StatsView from '../stats/stats-view';
 
-const ChartWrapper = lazy(() => import('../chart/chart-wrapper'));
-const Tutorial = lazy(() => import('../tutorials'));
 const CustomBots = lazy(() => import('../custom-bots'));
 
 const AppWrapper = observer(() => {
@@ -79,12 +78,13 @@ const AppWrapper = observer(() => {
     const { clear } = summary_card;
     const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
     const init_render = React.useRef(true);
-    const hash = ['dashboard', 'bot_builder', 'custom_bots', 'chart', 'tutorial'];
+    const hash = ['dashboard', 'bot_builder', 'custom_bots', 'chart', 'stats', 'tutorial'];
     const { isDesktop } = useDevice();
     const location = useLocation();
     const navigate = useNavigate();
     const [left_tab_shadow, setLeftTabShadow] = useState<boolean>(false);
     const [right_tab_shadow, setRightTabShadow] = useState<boolean>(false);
+    const [is_floating_chart_open, setIsFloatingChartOpen] = useState<boolean>(false);
 
     // Trade type modal state
     const [tradeTypeModalState, setTradeTypeModalState] = useState(getModalState());
@@ -241,7 +241,7 @@ const AppWrapper = observer(() => {
                             enableUrlParameterApplication();
                         },
                         // onCancel: URL parameter removal is now handled by the modal component
-                        () => {}
+                        () => { }
                     );
                 };
 
@@ -360,6 +360,10 @@ const AppWrapper = observer(() => {
 
     const handleTabChange = React.useCallback(
         (tab_index: number) => {
+            if (tab_index === DBOT_TABS.CHART) {
+                setIsFloatingChartOpen(prev => !prev);
+                return;
+            }
             setActiveTab(tab_index);
             const el_id = TAB_IDS[tab_index];
             if (el_id) {
@@ -402,7 +406,7 @@ const AppWrapper = observer(() => {
                                             width='24px'
                                             fill='var(--text-general)'
                                         />
-                                        <Localize i18n_default_text='Dashboard' />
+                                        <span>{localize('Dashboard')}</span>
                                     </>
                                 }
                                 id='id-dbot-dashboard'
@@ -417,7 +421,7 @@ const AppWrapper = observer(() => {
                                             width='24px'
                                             fill='var(--text-general)'
                                         />
-                                        <Localize i18n_default_text='Bot Builder' />
+                                        <span>{localize('Bot Builder')}</span>
                                     </>
                                 }
                                 id='id-bot-builder'
@@ -430,7 +434,7 @@ const AppWrapper = observer(() => {
                                             width='24px'
                                             fill='var(--text-general)'
                                         />
-                                        <Localize i18n_default_text='Quick Strategies' />
+                                        <span>{localize('Quick Strategies')}</span>
                                     </>
                                 }
                                 id='id-custom-bots'
@@ -449,50 +453,32 @@ const AppWrapper = observer(() => {
                                             width='24px'
                                             fill='var(--text-general)'
                                         />
-                                        <Localize i18n_default_text='Charts' />
+                                        <span>{localize('Charts')}</span>
                                     </>
                                 }
-                                id={
-                                    is_chart_modal_visible || is_trading_view_modal_visible
-                                        ? 'id-charts--disabled'
-                                        : 'id-charts'
-                                }
-                            >
-                                <Suspense
-                                    fallback={<ChunkLoader message={localize('Please wait, loading chart...')} />}
-                                >
-                                    <ChartWrapper show_digits_stats={false} />
-                                </Suspense>
-                            </div>
+                                id='id-charts'
+                            />
                             <div
                                 label={
                                     <>
-                                        <LegacyGuide1pxIcon
-                                            height='16px'
-                                            width='16px'
+                                        <LabelPairedChartLineCaptionRegularIcon
+                                            height='24px'
+                                            width='24px'
                                             fill='var(--text-general)'
-                                            className='icon-general-fill-g-path'
                                         />
-                                        <Localize i18n_default_text='Tutorials' />
+                                        <span>{localize('Stats')}</span>
                                     </>
                                 }
-                                id='id-tutorials'
+                                id='id-stats'
                             >
-                                <div className='tutorials-wrapper'>
-                                    <Suspense
-                                        fallback={
-                                            <ChunkLoader message={localize('Please wait, loading tutorials...')} />
-                                        }
-                                    >
-                                        <Tutorial handleTabChange={handleTabChange} />
-                                    </Suspense>
-                                </div>
+                                <StatsView />
                             </div>
                         </Tabs>
                         {!isDesktop && right_tab_shadow && <span className='tabs-shadow tabs-shadow--right' />}{' '}
                     </div>
                 </div>
             </div>
+            <DraggableChartOverlay isOpen={is_floating_chart_open} onClose={() => setIsFloatingChartOpen(false)} />
             <DesktopWrapper>
                 <div className='main__run-strategy-wrapper'>
                     <RunStrategy />

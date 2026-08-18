@@ -29,7 +29,7 @@ type TTransactionItem = {
     active_transaction_id?: number | null;
 };
 
-const TransactionItem = ({ row = false, onClickTransaction, active_transaction_id }: TTransactionItem) => {
+const TransactionItem = ({ row = false, onClickTransaction, active_transaction_id, group_id = 0, is_first_in_group = false, row_index = 0 }: TTransactionItem) => {
     switch (row.type) {
         case transaction_elements.CONTRACT: {
             const { data: contract } = row;
@@ -38,6 +38,9 @@ const TransactionItem = ({ row = false, onClickTransaction, active_transaction_i
                     contract={contract}
                     onClickTransaction={onClickTransaction}
                     active_transaction_id={active_transaction_id}
+                    group_id={group_id}
+                    is_first_in_group={is_first_in_group}
+                    row_index={row_index}
                 />
             );
         }
@@ -60,6 +63,35 @@ const Transactions = observer(({ is_drawer_open }: TTransactions) => {
     const { contract_stage } = run_panel;
     const { transactions: transaction_list, toggleTransactionDetailsModal, recoverPendingContracts } = transactions;
     const { isDesktop } = useDevice();
+
+    const groupInfo = React.useMemo(() => {
+        if (!transaction_list?.length) return [];
+        
+        let currentGroupId = 0;
+        let lastKey: string | null = null;
+        const info: Array<{ group_id: number; is_first_in_group: boolean }> = [];
+
+        transaction_list.forEach((row, idx) => {
+            if (row.type === transaction_elements.CONTRACT && row.data) {
+                const contract = row.data;
+                const key = `${contract.date_start}_${contract.entry_spot}_${contract.entry_tick_time}`;
+                
+                let isFirst = false;
+                if (lastKey !== null && key !== lastKey) {
+                    currentGroupId++;
+                    isFirst = true;
+                } else if (idx === 0) {
+                    isFirst = true;
+                }
+                lastKey = key;
+                info.push({ group_id: currentGroupId, is_first_in_group: isFirst });
+            } else {
+                info.push({ group_id: currentGroupId, is_first_in_group: false });
+            }
+        });
+
+        return info;
+    }, [transaction_list]);
 
     React.useEffect(() => {
         window.addEventListener('click', onClickOutsideTransaction);
@@ -103,7 +135,7 @@ const Transactions = observer(({ is_drawer_open }: TTransactions) => {
                 'run-panel-tab__content--mobile': !isDesktop && is_drawer_open,
             })}
         >
-            <div className='download__container transaction-details__button-container'>
+            <div className='download__container transaction-details__button-container' style={{ padding: '2px 8px', display: 'flex', justifyContent: 'flex-end', gap: '4px', alignItems: 'center' }}>
                 <Download tab='transactions' />
                 <Button
                     id='download__container__view-detail-button'
@@ -113,19 +145,31 @@ const Transactions = observer(({ is_drawer_open }: TTransactions) => {
                         toggleTransactionDetailsModal(true);
                     }}
                     secondary
+                    style={{
+                        padding: '2px 8px',
+                        height: '22px',
+                        fontSize: '10px',
+                        borderRadius: '4px',
+                    }}
                 >
-                    <Localize i18n_default_text='View Detail' />
+                    <Localize i18n_default_text='Detail' />
                 </Button>
             </div>
             <div className='transactions__header'>
                 <span className='transactions__header-column transactions__header-type'>
                     <Localize i18n_default_text='Type' />
                 </span>
-                <span className='transactions__header-column transactions__header-spot'>
-                    <Localize i18n_default_text='Entry/Exit spot' />
+                <span className='transactions__header-column transactions__header-entry-spot'>
+                    <Localize i18n_default_text='Entry Spot' />
+                </span>
+                <span className='transactions__header-column transactions__header-exit-spot'>
+                    <Localize i18n_default_text='Exit Spot' />
+                </span>
+                <span className='transactions__header-column transactions__header-stake'>
+                    <Localize i18n_default_text='Stake' />
                 </span>
                 <span className='transactions__header-column transactions__header-profit'>
-                    <Localize i18n_default_text='Buy price and P/L' />
+                    <Localize i18n_default_text='P/L' />
                 </span>
             </div>
             <div
@@ -139,13 +183,19 @@ const Transactions = observer(({ is_drawer_open }: TTransactions) => {
                         <DataList
                             className='transactions'
                             data_source={transaction_list}
-                            rowRenderer={props => (
-                                <TransactionItem
-                                    onClickTransaction={onClickTransaction}
-                                    active_transaction_id={active_transaction_id}
-                                    {...props}
-                                />
-                            )}
+                            rowRenderer={({ index, ...props }) => {
+                                const gInfo = groupInfo[index] || { group_id: 0, is_first_in_group: false };
+                                return (
+                                    <TransactionItem
+                                        onClickTransaction={onClickTransaction}
+                                        active_transaction_id={active_transaction_id}
+                                        group_id={gInfo.group_id}
+                                        is_first_in_group={gInfo.is_first_in_group}
+                                        row_index={index}
+                                        {...props}
+                                    />
+                                );
+                            }}
                             keyMapper={row => {
                                 switch (row.type) {
                                     case transaction_elements.CONTRACT: {
@@ -163,10 +213,10 @@ const Transactions = observer(({ is_drawer_open }: TTransactions) => {
                                 const row = transaction_list?.[index];
                                 switch (row.type) {
                                     case transaction_elements.CONTRACT: {
-                                        return 50;
+                                        return 22;
                                     }
                                     case transaction_elements.DIVIDER: {
-                                        return 21;
+                                        return 12;
                                     }
                                     default: {
                                         return 0;

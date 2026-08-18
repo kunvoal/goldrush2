@@ -12,6 +12,8 @@ import { useDevice } from '@deriv-com/ui';
 import ToolbarButton from '../toolbar/toolbar-button';
 import SearchBox from './search-box';
 import { ToolboxItems } from './toolbox-items';
+import { FireCanvasOverlay } from '@/components/fire-canvas-overlay/fire-canvas-overlay';
+import { FireSvgOverlay } from '@/components/fire-svg-overlay/fire-svg-overlay';
 
 const Toolbox = observer(() => {
     const { isDesktop } = useDevice();
@@ -49,9 +51,35 @@ const Toolbox = observer(() => {
         /* [/AI] */
     };
 
-    if (isDesktop) {
-        return (
-            <div className='db-toolbox' data-testid='dashboard__toolbox'>
+    return (
+        <div className='db-toolbox' data-testid='dashboard__toolbox' style={{ position: 'relative' }}>
+            <FireSvgOverlay />
+            <FireCanvasOverlay />
+            
+            {/* Fiery Toggle Pill for easy reopening */}
+            {!is_open && (
+                <button
+                    onClick={() => setOpen(true)}
+                    style={{
+                        position: 'absolute',
+                        top: '12px',
+                        left: '12px',
+                        zIndex: 99,
+                        background: 'linear-gradient(90deg, #ff1a00, #ff7700)',
+                        border: '1px solid #ffcc00',
+                        borderRadius: '20px',
+                        color: '#ffffff',
+                        padding: '6px 14px',
+                        fontWeight: 900,
+                        fontSize: '11px',
+                        cursor: 'pointer',
+                        boxShadow: '0 0 15px rgba(255, 68, 0, 0.9)',
+                        letterSpacing: '0.5px'
+                    }}
+                >
+                    🔥 BLOCKS MENU
+                </button>
+            )}
                 <ToolbarButton
                     popover_message={localize('Click here to start building your Deriv Bot.')}
                     button_id='db-toolbar__get-started-button'
@@ -69,7 +97,9 @@ const Toolbox = observer(() => {
                                 setVisibility(false);
                             }}
                         >
-                            {localize('Blocks menu')}
+                            <span style={{ color: '#ffffff', fontWeight: 900, fontSize: '14px', textShadow: '0 0 10px #ff3300' }}>
+                                Blocks menu
+                            </span>
                             <span
                                 className={classNames('db-toolbox__title__chevron', {
                                     'db-toolbox__title__chevron--active': is_open,
@@ -173,8 +203,6 @@ const Toolbox = observer(() => {
                 </div>
             </div>
         );
-    }
-    return null;
 });
 
 export default Toolbox;

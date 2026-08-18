@@ -133,6 +133,16 @@ const Interpreter = () => {
         );
         js_interpreter.setProperty(
             pseudo_bot_interface,
+            'bulkPurchase',
+            createAsync(js_interpreter, bot_interface.bulkPurchase)
+        );
+        js_interpreter.setProperty(
+            pseudo_bot_interface,
+            'bulkComboPurchase',
+            createAsync(js_interpreter, bot_interface.bulkComboPurchase)
+        );
+        js_interpreter.setProperty(
+            pseudo_bot_interface,
             'sellAtMarket',
             createAsync(js_interpreter, bot_interface.sellAtMarket)
         );

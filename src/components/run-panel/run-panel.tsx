@@ -18,6 +18,8 @@ import { useStore } from '@/hooks/useStore';
 import { Localize, localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 import ThemedScrollbars from '../shared_ui/themed-scrollbars';
+import { FireCanvasOverlay } from '@/components/fire-canvas-overlay/fire-canvas-overlay';
+import { FireSvgOverlay } from '@/components/fire-svg-overlay/fire-svg-overlay';
 
 type TStatisticsTile = {
     content: React.ElementType | string;
@@ -62,9 +64,9 @@ type TStatisticsInfoModal = {
 };
 
 const StatisticsTile = ({ content, contentClassName, title }: TStatisticsTile) => (
-    <div className='run-panel__tile'>
-        <div className='run-panel__tile-title'>{title}</div>
-        <div className={classNames('run-panel__tile-content', contentClassName)}>{content}</div>
+    <div className='run-panel__tile' style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '4px', height: '100%', padding: '0 2px' }}>
+        <span className='run-panel__tile-title' style={{ margin: 0, minHeight: 'auto', fontSize: '10.5px', fontWeight: 600, color: 'var(--text-general)' }}>{title}:</span>
+        <span className={classNames('run-panel__tile-content', contentClassName)} style={{ margin: 0, height: 'auto', fontSize: '10.5px' }}>{content}</span>
     </div>
 );
 
@@ -75,41 +77,35 @@ export const StatisticsSummary = ({
     number_of_runs,
     total_stake,
     total_payout,
-    toggleStatisticsInfoModal,
     total_profit,
     won_contracts,
+    max_drawdown = 0,
 }: TStatisticsSummary) => (
     <div
         className={classNames('run-panel__stat', {
             'run-panel__stat--mobile': is_mobile,
         })}
     >
-        <div className='run-panel__stat--info' onClick={toggleStatisticsInfoModal}>
-            <div className='run-panel__stat--info-item'>
-                <Localize i18n_default_text="What's this?" />
-            </div>
-        </div>
         <div className='run-panel__stat--tiles'>
             <StatisticsTile
-                title={localize('Total stake')}
+                title={localize('Stake')}
                 alignment='top'
                 content={<Money amount={total_stake} currency={currency} show_currency />}
             />
             <StatisticsTile
-                title={localize('Total payout')}
+                title={localize('Payout')}
                 alignment='top'
                 content={<Money amount={total_payout} currency={currency} show_currency />}
             />
-            <StatisticsTile title={localize('No. of runs')} alignment='top' content={number_of_runs} />
-            <StatisticsTile title={localize('Contracts lost')} alignment='bottom' content={lost_contracts} />
-            <StatisticsTile title={localize('Contracts won')} alignment='bottom' content={won_contracts} />
+            <StatisticsTile title={localize('Runs')} alignment='top' content={number_of_runs} />
+            <StatisticsTile title={localize('Lost')} alignment='bottom' content={lost_contracts} />
+            <StatisticsTile title={localize('Won')} alignment='bottom' content={won_contracts} />
             <StatisticsTile
-                title={localize('Total profit/loss')}
-                content={<Money amount={total_profit} currency={currency} has_sign show_currency />}
+                title={localize('Lowest')}
+                content={<Money amount={max_drawdown} currency={currency} has_sign show_currency />}
                 alignment='bottom'
                 contentClassName={classNames('run-panel__stat-amount', {
-                    'run-panel__stat-amount--positive': total_profit > 0,
-                    'run-panel__stat-amount--negative': total_profit < 0,
+                    'run-panel__stat-amount--negative': max_drawdown < 0,
                 })}
             />
         </div>
@@ -131,7 +127,6 @@ const DrawerHeader = ({ is_clear_stat_disabled, is_mobile, is_drawer_open, onCle
 
 const DrawerContent = ({ active_index, is_drawer_open, active_tour, setActiveTabIndex, ...props }: TDrawerContent) => {
     const { isDesktop } = useDevice();
-    // Use the useBlockScroll hook to prevent body scrolling when drawer is open on mobile
 
     React.useEffect(() => {
         if (!isDesktop && is_drawer_open) {
@@ -148,9 +143,6 @@ const DrawerContent = ({ active_index, is_drawer_open, active_tour, setActiveTab
     return (
         <>
             <Tabs active_index={active_index} onTabItemClick={setActiveTabIndex} top>
-                <div id='db-run-panel-tab__summary' label={<Localize i18n_default_text='Summary' />}>
-                    <Summary is_drawer_open={is_drawer_open} />
-                </div>
                 <div id='db-run-panel-tab__transactions' label={<Localize i18n_default_text='Transactions' />}>
                     <Transactions is_drawer_open={is_drawer_open} />
                 </div>
@@ -158,25 +150,30 @@ const DrawerContent = ({ active_index, is_drawer_open, active_tour, setActiveTab
                     <Journal />
                 </div>
             </Tabs>
-            {((is_drawer_open && active_index !== 2) || active_tour) && <StatisticsSummary {...props} />}
+            {((is_drawer_open && active_index !== 1) || active_tour) && <StatisticsSummary {...props} />}
         </>
     );
 };
 
-const DrawerFooter = ({ is_clear_stat_disabled, onClearStatClick }: TDrawerFooter) => (
-    <div className='run-panel__footer'>
+const DrawerFooter = ({ is_clear_stat_disabled, onClearStatClick, total_profit = 0, currency }: TDrawerFooter) => (
+    <div className='run-panel__footer' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', padding: '6px 0 2px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', fontWeight: 700 }}>
+            <span style={{ color: 'var(--text-general)' }}>P/L:</span>
+            <span className={classNames('run-panel__stat-amount', {
+                'run-panel__stat-amount--positive': total_profit > 0,
+                'run-panel__stat-amount--negative': total_profit < 0,
+            })} style={{ fontSize: '12px' }}>
+                <Money amount={total_profit} currency={currency} has_sign show_currency />
+            </span>
+        </div>
         <Button
             id='db-run-panel__clear-button'
             className='run-panel__footer-button'
             disabled={is_clear_stat_disabled}
+            text={localize('Reset')}
             onClick={onClearStatClick}
-            has_effect
             secondary
-        >
-            <span>
-                <Localize i18n_default_text='Reset' />
-            </span>
-        </Button>
+        />
     </div>
 );
 
@@ -267,7 +264,7 @@ const RunPanel = observer(() => {
     } = run_panel;
     const { statistics } = transactions;
     const { active_tour, active_tab } = dashboard;
-    const { total_payout, total_profit, total_stake, won_contracts, lost_contracts, number_of_runs } = statistics;
+    const { total_payout, total_profit, total_stake, won_contracts, lost_contracts, number_of_runs, max_drawdown } = statistics;
     const { BOT_BUILDER, CHART } = DBOT_TABS;
 
     React.useEffect(() => {
@@ -296,11 +293,19 @@ const RunPanel = observer(() => {
             total_profit={total_profit}
             total_stake={total_stake}
             won_contracts={won_contracts}
+            max_drawdown={max_drawdown}
             active_tour={active_tour}
         />
     );
 
-    const footer = <DrawerFooter is_clear_stat_disabled={is_clear_stat_disabled} onClearStatClick={onClearStatClick} />;
+    const footer = (
+        <DrawerFooter
+            is_clear_stat_disabled={is_clear_stat_disabled}
+            onClearStatClick={onClearStatClick}
+            total_profit={total_profit}
+            currency={currency}
+        />
+    );
 
     const header = (
         <DrawerHeader
@@ -316,7 +321,9 @@ const RunPanel = observer(() => {
 
     return (
         <>
-            <div className={!isDesktop && is_drawer_open ? 'run-panel__container--mobile' : 'run-panel'}>
+            <div className={!isDesktop && is_drawer_open ? 'run-panel__container--mobile' : 'run-panel'} style={{ position: 'relative', overflow: 'hidden' }}>
+                <FireSvgOverlay opacity={0.7} />
+                <FireCanvasOverlay opacity={0.65} />
                 <Drawer
                     anchor='right'
                     className={classNames('run-panel', {
@@ -328,7 +335,7 @@ const RunPanel = observer(() => {
                     footer={isDesktop && footer}
                     is_open={is_drawer_open}
                     toggleDrawer={toggleDrawer}
-                    width={366}
+                    width={500}
                     zIndex={popover_zindex.RUN_PANEL}
                 >
                     {content}

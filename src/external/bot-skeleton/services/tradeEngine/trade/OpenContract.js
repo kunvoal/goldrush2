@@ -22,20 +22,45 @@ export default Engine =>
                     broadcastContract({ accountID: api_base.account_info.loginid, ...contract });
 
                     if (this.isSold) {
-                        this.contractId = '';
-                        clearTimeout(this.transaction_recovery_timeout);
-                        this.updateTotals(contract);
-                        contractStatus({
-                            id: 'contract.sold',
-                            data: contract.transaction_ids.sell,
-                            contract,
-                        });
+                        if (this.contractIds && this.contractIds.length > 0) {
+                            if (!this.completedBulkContractIds) this.completedBulkContractIds = new Set();
+                            this.completedBulkContractIds.add(contract.contract_id);
 
-                        if (this.afterPromise) {
-                            this.afterPromise();
+                            this.updateTotals(contract);
+                            contractStatus({
+                                id: 'contract.sold',
+                                data: contract.transaction_ids ? contract.transaction_ids.sell : '',
+                                contract,
+                            });
+
+                            const allDone = this.contractIds.every(id => this.completedBulkContractIds.has(id));
+                            if (allDone) {
+                                this.contractId = '';
+                                this.contractIds = [];
+                                this.completedBulkContractIds.clear();
+                                clearTimeout(this.transaction_recovery_timeout);
+
+                                if (this.afterPromise) {
+                                    this.afterPromise();
+                                }
+                                this.store.dispatch(sell());
+                            }
+                        } else {
+                            this.contractId = '';
+                            clearTimeout(this.transaction_recovery_timeout);
+                            this.updateTotals(contract);
+                            contractStatus({
+                                id: 'contract.sold',
+                                data: contract.transaction_ids ? contract.transaction_ids.sell : '',
+                                contract,
+                            });
+
+                            if (this.afterPromise) {
+                                this.afterPromise();
+                            }
+
+                            this.store.dispatch(sell());
                         }
-
-                        this.store.dispatch(sell());
                     } else {
                         this.store.dispatch(openContractReceived());
                     }
@@ -60,6 +85,9 @@ export default Engine =>
         }
 
         expectedContractId(contractId) {
+            if (this.contractIds && this.contractIds.length > 0) {
+                return this.contractIds.includes(contractId);
+            }
             return this.contractId && contractId === this.contractId;
         }
 

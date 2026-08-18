@@ -36,6 +36,9 @@ type TTransaction = {
     contract?: TContractInfo | null;
     onClickTransaction?: (transaction_id: null | number) => void;
     active_transaction_id?: number | null;
+    group_id?: number;
+    is_first_in_group?: boolean;
+    row_index?: number;
 };
 
 const TransactionIconWithText = ({ icon, title, message, className }: TTransactionIconWithText) => (
@@ -159,20 +162,55 @@ const PopoverContent = ({ contract }: TPopoverContent) => (
     </div>
 );
 
-const Transaction = ({ contract, active_transaction_id, onClickTransaction }: TTransaction) => {
+const Transaction = ({ contract, active_transaction_id, onClickTransaction, group_id = 0, is_first_in_group = false, row_index = 0 }: TTransaction) => {
+    const is_alt_group = group_id % 2 === 1;
+
     return (
         <Popover
             zIndex={popover_zindex.TRANSACTION.toString()}
             alignment={isDbotRTL() ? 'right' : 'left'}
-            className='transactions__item-wrapper'
+            className={classNames('transactions__item-wrapper', {
+                'transactions__item-wrapper--alt': is_alt_group,
+                'transactions__item-wrapper--first-in-group': is_first_in_group && row_index > 0,
+            })}
             is_open={!!(contract && active_transaction_id === contract?.transaction_ids?.buy)}
             message={contract && <PopoverContent contract={contract} />}
         >
-            <div
-                data-testid='dt_transactions_item'
-                className='transactions__item'
-                onClick={() => onClickTransaction && onClickTransaction(contract?.transaction_ids?.buy || null)}
-            >
+            {(() => {
+            const profitVal = Number(contract?.profit);
+            const isWin = contract?.is_completed && profitVal >= 0;
+            const isLoss = contract?.is_completed && profitVal < 0;
+
+            let borderLeftStyle = '2.5px solid transparent';
+            let bgStyle = is_alt_group ? 'rgba(14, 165, 233, 0.16)' : 'rgba(255, 255, 255, 0.02)';
+            let shadowStyle = 'none';
+
+            if (isWin) {
+                borderLeftStyle = '3.5px solid #10b981';
+                bgStyle = 'rgba(16, 185, 129, 0.12)';
+                shadowStyle = 'inset 0 0 10px rgba(16, 185, 129, 0.2)';
+            } else if (isLoss) {
+                borderLeftStyle = '3.5px solid #ef4444';
+                bgStyle = 'rgba(239, 68, 68, 0.12)';
+                shadowStyle = 'inset 0 0 10px rgba(239, 68, 68, 0.2)';
+            } else if (contract?.barrier !== undefined) {
+                borderLeftStyle = is_alt_group ? '2.5px solid #0ea5e9' : '2.5px solid rgba(81, 9, 190, 0.6)';
+            }
+
+            return (
+                <div
+                    key={contract?.id || row_index}
+                    data-testid='dt_transactions_item'
+                    className='transactions__item'
+                    style={{
+                        background: bgStyle,
+                        borderLeft: borderLeftStyle,
+                        borderTop: is_first_in_group && row_index > 0 ? '1px solid rgba(14, 165, 233, 0.4)' : 'none',
+                        boxShadow: shadowStyle,
+                        transition: 'all 0.2s ease',
+                    }}
+                    onClick={() => onClickTransaction && onClickTransaction(contract?.transaction_ids?.buy || null)}
+                >
                 <div className='transactions__cell transactions__trade-type'>
                     <div className='transactions__loader-container'>
                         {contract ? (
@@ -208,7 +246,17 @@ const Transaction = ({ contract, active_transaction_id, onClickTransaction }: TT
                     <TransactionIconWithText
                         icon={<LegacyRadioOnIcon height={10} width={10} />}
                         title={localize('Entry spot')}
-                        message={contract?.entry_spot ?? <TransactionFieldLoader />}
+                        message={
+                            contract?.entry_spot ? (
+                                contract.barrier !== undefined && contract.barrier !== null && contract.barrier !== '' ? (
+                                    `${contract.entry_spot} (T: ${contract.barrier})`
+                                ) : (
+                                    contract.entry_spot
+                                )
+                            ) : (
+                                <TransactionFieldLoader />
+                            )
+                        }
                     />
                 </div>
                 <div className='transactions__cell transactions__exit-spot'>
@@ -239,7 +287,9 @@ const Transaction = ({ contract, active_transaction_id, onClickTransaction }: TT
                         <TransactionFieldLoader />
                     )}
                 </div>
-            </div>
+                </div>
+            );
+            })()}
         </Popover>
     );
 };

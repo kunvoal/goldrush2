@@ -30,7 +30,15 @@ $colour_toolboxSelected: $black;
 
     .flyout rect.blocklyFieldRect.blocklyDropdownRect,
     .flyout .zelos-renderer.classic-theme .blocklyMainBackground {
-        fill: #151816 !important;
+        fill: #1c0200 !important;
+    }
+
+    .flyout .blocklyFlyoutBackground {
+        fill: #1c0200 !important;
+        fill-opacity: 0.98 !important;
+        stroke: #ff4500 !important;
+        stroke-width: 2.5px !important;
+        filter: drop-shadow(0 0 25px rgba(255, 68, 0, 0.95)) !important;
     }
 
     .zelos-renderer.zelos_renderer-theme .blocklyEditableText > image,
@@ -53,7 +61,7 @@ $colour_toolboxSelected: $black;
 }
 
 .flyout .zelos-renderer.classic-theme .blocklyMainBackground {
-    filter: unset;
+    filter: drop-shadow(0 0 20px rgba(255, 68, 0, 0.8));
 }
 
 .zelos-renderer.zelos_renderer-theme,
@@ -1252,3 +1260,342 @@ drag a block and selected text moves instead.
 g.editing .blocklyEditableText {
     display: none !important;
 }
+
+/* ==========================================
+   LED & SNAKE LIGHT ANIMATION SYSTEM (GOLDRUSH)
+   ========================================== */
+
+@keyframes led-snake-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes led-pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(16, 185, 129, 0.4), 0 0 15px rgba(6, 182, 212, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.8), 0 0 25px rgba(6, 182, 212, 0.6);
+    }
+}
+
+@keyframes led-badge-pulse {
+    0%, 100% {
+        box-shadow: 0 0 6px #f59e0b, 0 0 12px #ffffff;
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 14px #f59e0b, 0 0 22px #ffffff;
+        transform: scale(1.03);
+    }
+}
+
+/* Continuous Snake Light Flowing Directly Through Navigation Bar */
+.led-snake-nav-flow {
+    position: relative;
+    background: linear-gradient(90deg, 
+        rgba(16, 185, 129, 0.25), 
+        rgba(6, 182, 212, 0.3), 
+        rgba(239, 68, 68, 0.25), 
+        rgba(255, 255, 255, 0.35), 
+        rgba(245, 158, 11, 0.3), 
+        rgba(236, 72, 153, 0.3), 
+        rgba(16, 185, 129, 0.25)
+    ) !important;
+    background-size: 300% 300% !important;
+    animation: led-snake-shift 3s linear infinite !important;
+    border-radius: 6px;
+    padding: 3px;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.35), inset 0 0 8px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Snake Light Gradient Border */
+.led-snake-header-line {
+    position: relative;
+}
+
+.led-snake-header-line::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2.5px;
+    background: linear-gradient(90deg, #10b981, #06b6d4, #ef4444, #ffffff, #f59e0b, #ec4899, #10b981);
+    background-size: 300% 300%;
+    animation: led-snake-shift 4s ease infinite;
+    border-radius: 2px;
+}
+
+/* Loaded Bot Snake Light Card Border */
+.led-snake-card-loaded {
+    position: relative;
+    background: rgba(245, 158, 11, 0.16) !important;
+    border: 1px solid #f59e0b !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5), inset 0 0 8px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* LED Trade Logs Highlights */
+.led-log-win {
+    border-left: 3.5px solid #10b981 !important;
+    background: rgba(16, 185, 129, 0.08) !important;
+    box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.15);
+}
+
+.led-log-loss {
+    border-left: 3.5px solid #ef4444 !important;
+    background: rgba(239, 68, 68, 0.08) !important;
+    box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.15);
+}
+
+/* =========================================================
+   GOLDRUSH MASTER CONTINUOUS ANIMATED SNAKE LED OVERHAUL
+   ========================================================= */
+
+@keyframes led-snake-shift-fast {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes led-snake-shift-vertical {
+    0% {
+        background-position: 50% 0%;
+    }
+    50% {
+        background-position: 50% 100%;
+    }
+    100% {
+        background-position: 50% 0%;
+    }
+}
+
+@keyframes led-svg-glow {
+    0% {
+        stroke: #06b6d4;
+        filter: drop-shadow(0px 0px 6px #06b6d4) drop-shadow(0px 0px 12px #10b981);
+    }
+    33% {
+        stroke: #f59e0b;
+        filter: drop-shadow(0px 0px 8px #f59e0b) drop-shadow(0px 0px 14px #ec4899);
+    }
+    66% {
+        stroke: #ef4444;
+        filter: drop-shadow(0px 0px 8px #ef4444) drop-shadow(0px 0px 14px #06b6d4);
+    }
+    100% {
+        stroke: #06b6d4;
+        filter: drop-shadow(0px 0px 6px #06b6d4) drop-shadow(0px 0px 12px #10b981);
+    }
+}
+
+/* 1. Main App Top Navigation Bar (Dashboard, Bot Builder, Quick Strategies, Charts, Tutorials) */
+.dc-tabs__list,
+.dc-tabs__list--top,
+.main__tabs .dc-tabs__list,
+.header__menu,
+.main__container > div > .dc-tabs__list {
+    background: linear-gradient(90deg, 
+        rgba(16, 185, 129, 0.35), 
+        rgba(6, 182, 212, 0.45), 
+        rgba(239, 68, 68, 0.35), 
+        rgba(255, 255, 255, 0.55), 
+        rgba(245, 158, 11, 0.45), 
+        rgba(236, 72, 153, 0.45), 
+        rgba(16, 185, 129, 0.35)
+    ) !important;
+    background-size: 300% 300% !important;
+    animation: led-snake-shift-fast 3.5s linear infinite !important;
+    border-bottom: 2.5px solid #06b6d4 !important;
+    box-shadow: 0 0 18px rgba(6, 182, 212, 0.65), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+    border-radius: 6px 6px 0 0;
+}
+
+.dc-tabs__item,
+.main__tabs .dc-tabs__item {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    transition: all 0.2s ease !important;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+        text-shadow: 0 0 10px #06b6d4;
+    }
+
+    &--active,
+    &.dc-tabs__item--active {
+        background: rgba(0, 0, 0, 0.55) !important;
+        border-bottom: 3px solid #f59e0b !important;
+        box-shadow: 0 0 14px rgba(245, 158, 11, 0.7) !important;
+        text-shadow: 0 0 12px #ffffff;
+    }
+}
+
+/* 2. Vertical Dynamic Snake LED Flow on Blocks Menu Sidebar */
+.dbot-sidebar,
+.flyout,
+.toolbox,
+.toolbox__content,
+.dc-accordion,
+.dc-accordion__item,
+.flyout__button,
+.flyout__item,
+.flyout__title,
+.workspace-sidebar,
+div:has(> .dc-accordion) {
+    background: linear-gradient(180deg, 
+        rgba(16, 185, 129, 0.3), 
+        rgba(6, 182, 212, 0.4), 
+        rgba(239, 68, 68, 0.3), 
+        rgba(255, 255, 255, 0.45), 
+        rgba(245, 158, 11, 0.4), 
+        rgba(236, 72, 153, 0.4), 
+        rgba(16, 185, 129, 0.3)
+    ) !important;
+    background-size: 300% 300% !important;
+    animation: led-snake-shift-vertical 3.5s linear infinite !important;
+    border-right: 2.5px solid #06b6d4 !important;
+    color: #ffffff !important;
+}
+
+.dc-accordion__header,
+.flyout__item-header {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    text-shadow: 0 0 8px #06b6d4 !important;
+}
+
+/* 3. Transactions & Journal Table Header (Type | Entry Spot | Exit Spot | Stake | P/L) */
+.transactions__header,
+.transactions__table-header,
+.transactions__item-header,
+.journal__header,
+.run-panel-tab__header {
+    background: linear-gradient(90deg, 
+        rgba(6, 182, 212, 0.35), 
+        rgba(16, 185, 129, 0.35), 
+        rgba(245, 158, 11, 0.35), 
+        rgba(236, 72, 153, 0.35), 
+        rgba(6, 182, 212, 0.35)
+    ) !important;
+    background-size: 300% 300% !important;
+    animation: led-snake-shift-fast 4s ease infinite !important;
+    border-bottom: 2px solid #06b6d4 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    text-shadow: 0 0 8px rgba(6, 182, 212, 0.9) !important;
+}
+
+/* 4. Real-Time Dynamic Snake LED on Outer Root Blocks ONLY (Preserving Inner White Statements) */
+g.blocklyRootBlock > path.blocklyPath,
+.blocklyTextRootBlockHeader + path.blocklyPath,
+g.blocklyDraggable:not(g.blocklyDraggable g.blocklyDraggable) > path.blocklyPath {
+    fill: #0f172a !important; /* Deep navy sleek wrapper */
+    animation: led-svg-glow 3.5s infinite linear !important;
+    stroke-width: 2.5px !important;
+}
+
+/* PRESERVE original white/light background on all inner statement blocks, inputs, and fields */
+g.blocklyDraggable g.blocklyDraggable > path.blocklyPath,
+g.blocklyDraggable g.blocklyDraggable rect.blocklyFieldRect,
+.blocklyStatementInput path.blocklyPath,
+.blocklyBlockCanvas g.blocklyDraggable g.blocklyDraggable > path.blocklyPath {
+    fill: #ffffff !important;
+    stroke: none !important;
+    filter: none !important;
+    animation: none !important;
+}
+
+/* Blockly Root Header Titles (1. Trade parameters, 2. Purchase conditions, 3. Sell conditions) */
+.blocklyTextRootBlockHeader,
+.blocklyTextRootBlockHeaderCollapsed {
+    fill: #ffffff !important;
+    font-weight: 900 !important;
+    text-shadow: 0 0 10px #06b6d4, 0 0 18px #10b981 !important;
+}
+
+/* Run / Stop Panel Bar Snake Light Glow */
+.run-panel__header,
+.run-panel__footer {
+    border-top: 1.5px solid #06b6d4 !important;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.4) !important;
+}
+
+/* =========================================================
+   GOLDRUSH FLOATING CHART OVERLAY & PRICE QUOTE DEBUG FIX
+   ========================================================= */
+
+/* Ensure SmartCharts canvas stays strictly within container width without right overflow */
+.draggable-chart-overlay {
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+.draggable-chart-overlay .chart-container,
+.draggable-chart-overlay .smartcharts-chart-container,
+.draggable-chart-overlay .smartcharts-chart,
+.draggable-chart-overlay .ciq-chart {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+.draggable-chart-overlay .stx-marker {
+    z-index: 100 !important;
+}
+
+/* Goldrush Vertical Momentum Gap Bands */
+.goldrush-gap-band-up {
+    background: rgba(16, 185, 129, 0.22) !important;
+    border-left: 1.5px solid #10b981 !important;
+    border-right: 1.5px solid #10b981 !important;
+    box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.3) !important;
+}
+
+.goldrush-gap-band-down {
+    background: rgba(239, 68, 68, 0.22) !important;
+    border-left: 1.5px solid #ef4444 !important;
+    border-right: 1.5px solid #ef4444 !important;
+    box-shadow: inset 0 0 12px rgba(239, 68, 68, 0.3) !important;
+}
+
+/* Peak/Trough Gap Badges */
+.goldrush-gap-badge {
+    background: #0f172a;
+    border: 1px solid #06b6d4;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    box-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
+}
+
+/* Hide Percentage Stats Histogram Bar Chart */
+.draggable-chart-overlay .smartcharts-digit-stats,
+.draggable-chart-overlay .sc-m-digit-stats,
+.draggable-chart-overlay .sc-m-digit-stats-chart,
+.draggable-chart-overlay .sc-m-digit-stats-container {
+    display: none !important;
+}
+
+
+
+
+
+

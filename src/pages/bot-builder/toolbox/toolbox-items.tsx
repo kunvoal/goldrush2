@@ -161,6 +161,83 @@ export const ToolboxItems = () =>
             <Category id='purchase_conditions' name={localize('Purchase conditions')}>
                 <Block type='before_purchase' />
                 <Block type='purchase' />
+                <Block type='bulk_purchase' />
+            </Category>
+            <Category id='additionals' name={localize('Additionals')}>
+                <Block type='bulk_purchase'>
+                    <Value name='TARGETS'>
+                        <Shadow type='math_number'>
+                            <Field name='NUM'>2</Field>
+                        </Shadow>
+                    </Value>
+                </Block>
+                <Block type='top_n_common_digits'>
+                    <Field name='RANDOM_MODE'>FALSE</Field>
+                    <Value name='N_COUNT'>
+                        <Shadow type='math_number'>
+                            <Field name='NUM'>4</Field>
+                        </Shadow>
+                    </Value>
+                    <Value name='LOOKBACK'>
+                        <Shadow type='math_number'>
+                            <Field name='NUM'>30</Field>
+                        </Shadow>
+                    </Value>
+                </Block>
+                <Block type='over_under_combo_bulk'>
+                    <Field name='COMBO'>V5_IMPERVIOUS_QUADRANT_TRAP</Field>
+                </Block>
+                <Block type='updown_gap_predictor'>
+                    <Field name='TICK_RANGE'>3</Field>
+                    <Field name='STRATEGY'>GAP_FOLLOW</Field>
+                </Block>
+                <Block type='even_odd_advanced_predictor'>
+                    <Field name='ALGORITHM'>DENSITY_BIAS</Field>
+                    <Value name='LOOKBACK'>
+                        <Shadow type='math_number'>
+                            <Field name='NUM'>30</Field>
+                        </Shadow>
+                    </Value>
+                </Block>
+                <Block type='slt_strategy_executor'>
+                    <Field name='MODE'>MATCHES_SLT</Field>
+                    <Value name='STAKE'>
+                        <Shadow type='math_number'>
+                            <Field name='NUM'>1</Field>
+                        </Shadow>
+                    </Value>
+                    <Value name='STOP_LOSS'>
+                        <Shadow type='math_number'>
+                            <Field name='NUM'>0</Field>
+                        </Shadow>
+                    </Value>
+                    <Value name='TAKE_PROFIT'>
+                        <Shadow type='math_number'>
+                            <Field name='NUM'>5</Field>
+                        </Shadow>
+                    </Value>
+                </Block>
+                <Block type='frequency_analyzer'>
+                    <Value name='LOOKBACK'>
+                        <Shadow type='math_number'>
+                            <Field name='NUM'>30</Field>
+                        </Shadow>
+                    </Value>
+                </Block>
+                <Block type='streak_analyzer'>
+                    <Value name='LOOKBACK'>
+                        <Shadow type='math_number'>
+                            <Field name='NUM'>5</Field>
+                        </Shadow>
+                    </Value>
+                </Block>
+                <Block type='top_common_predictor'>
+                    <Value name='LOOKBACK'>
+                        <Shadow type='math_number'>
+                            <Field name='NUM'>30</Field>
+                        </Shadow>
+                    </Value>
+                </Block>
             </Category>
             <Category id='sell_conditions' name={localize('Sell conditions (optional)')}>
                 <Block type='during_purchase' />

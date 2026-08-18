@@ -150,6 +150,12 @@ const Download = observer(({ tab }: TDownloadProps) => {
                 className='download__button'
                 onClick={clickFunction}
                 secondary
+                style={{
+                    padding: '2px 8px',
+                    height: '22px',
+                    fontSize: '10px',
+                    borderRadius: '4px',
+                }}
             >
                 <Localize i18n_default_text='Download' />
             </Button>

@@ -5,11 +5,27 @@
 **/
 .run-panel {
     height: 0;
+    position: relative;
+    background: rgba(18, 2, 0, 0.55) !important;
+    backdrop-filter: blur(8px) !important;
+    border-left: 2px solid #ff4500 !important;
+    box-shadow: 0 0 35px rgba(255, 68, 0, 0.75), inset 0 0 20px rgba(255, 150, 0, 0.3) !important;
+
+    .dc-tabs__list {
+        background: linear-gradient(90deg, #3a0800 0%, #661000 50%, #3a0800 100%) !important;
+        border-bottom: 1.5px solid #ff4500 !important;
+    }
+
+    .dc-tabs__item--active {
+        color: #ffffaa !important;
+        border-bottom: 2.5px solid #ffcc00 !important;
+        text-shadow: 0 0 10px #ff3300 !important;
+    }
 
     &__container {
         height: var(--bot-content-height) !important;
         top: 10.4rem !important;
-        width: 36.6rem !important;
+        width: 50.0rem !important;
         right: 0;
 
         &--mobile {
@@ -60,7 +76,7 @@
         @include flex-center(flex-start, flex-end);
 
         flex-direction: column;
-        width: 35rem;
+        width: 100%;
         background-color: var(--general-section-2);
 
         @include mobile-or-tablet-screen {
@@ -77,7 +93,7 @@
             @include flex-center(center, flex-start);
 
             width: 33%;
-            padding: 16px 0 2px;
+            padding: 4px 0 2px;
             cursor: pointer;
             color: var(--text-general);
             -webkit-tap-highlight-color: transparent;
@@ -91,7 +107,7 @@
         &--tiles {
             width: 100%;
             display: grid;
-            grid-template: 64px 64px / 1fr 1fr 1fr;
+            grid-template: 32px 32px / 1fr 1fr 1fr;
         }
 
         &-amount {
@@ -122,9 +138,9 @@
         flex-direction: column;
 
         &-button {
-            width: 318px;
-            height: 32px !important;
-            margin: 12px 24px;
+            width: 240px;
+            height: 24px !important;
+            margin: 4px 12px;
         }
     }
 

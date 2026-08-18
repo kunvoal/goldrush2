@@ -68,10 +68,10 @@
     }
 
     &__item {
-        padding: 16px;
+        padding: 4px 10px;
 
         &-list {
-            height: calc(100% - 7.2rem);
+            height: calc(100% - 4.2rem);
         }
 
         &-content {
@@ -93,8 +93,7 @@
         &__container {
             display: flex;
             justify-content: space-between;
-            padding: 12px;
-            padding-left: 16px;
+            padding: 4px 10px;
             border: solid 1px var(--general-section-1);
 
             &-filter {
