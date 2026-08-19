@@ -9,6 +9,8 @@ import OnboardTourHandler from '../tutorials/dbot-tours/onboarding-tour';
 import Announcements from './announcements';
 import Cards from './cards';
 import InfoPanel from './info-panel';
+import { FireCanvasOverlay } from '@/components/fire-canvas-overlay/fire-canvas-overlay';
+import { FireSvgOverlay } from '@/components/fire-svg-overlay/fire-svg-overlay';
 
 type TMobileIconGuide = {
     handleTabChange: (active_number: number) => void;
@@ -30,10 +32,12 @@ const DashboardComponent = observer(({ handleTabChange }: TMobileIconGuide) => {
                 })}
             >
                 <div className='tab__dashboard__content'>
+                    <FireSvgOverlay opacity={0.65} />
+                    <FireCanvasOverlay opacity={0.6} />
                     {client.is_logged_in && (
                         <Announcements is_mobile={!isDesktop} is_tablet={isTablet} handleTabChange={handleTabChange} />
                     )}
-                    <div className='quick-panel'>
+                    <div className='quick-panel' style={{ position: 'relative', zIndex: 1 }}>
                         <div
                             className={classNames('tab__dashboard__header', {
                                 'tab__dashboard__header--listed': isDesktop && has_dashboard_strategies,

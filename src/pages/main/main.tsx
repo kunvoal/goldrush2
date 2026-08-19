@@ -402,8 +402,8 @@ const AppWrapper = observer(() => {
                                 label={
                                     <>
                                         <LabelPairedObjectsColumnCaptionRegularIcon
-                                            height='24px'
-                                            width='24px'
+                                            height='16px'
+                                            width='16px'
                                             fill='var(--text-general)'
                                         />
                                         <span>{localize('Dashboard')}</span>
@@ -417,8 +417,8 @@ const AppWrapper = observer(() => {
                                 label={
                                     <>
                                         <LabelPairedPuzzlePieceTwoCaptionBoldIcon
-                                            height='24px'
-                                            width='24px'
+                                            height='16px'
+                                            width='16px'
                                             fill='var(--text-general)'
                                         />
                                         <span>{localize('Bot Builder')}</span>
@@ -430,8 +430,8 @@ const AppWrapper = observer(() => {
                                 label={
                                     <>
                                         <LabelPairedPuzzlePieceTwoCaptionBoldIcon
-                                            height='24px'
-                                            width='24px'
+                                            height='16px'
+                                            width='16px'
                                             fill='var(--text-general)'
                                         />
                                         <span>{localize('Quick Strategies')}</span>
@@ -449,8 +449,8 @@ const AppWrapper = observer(() => {
                                 label={
                                     <>
                                         <LabelPairedChartLineCaptionRegularIcon
-                                            height='24px'
-                                            width='24px'
+                                            height='16px'
+                                            width='16px'
                                             fill='var(--text-general)'
                                         />
                                         <span>{localize('Charts')}</span>
@@ -462,8 +462,8 @@ const AppWrapper = observer(() => {
                                 label={
                                     <>
                                         <LabelPairedChartLineCaptionRegularIcon
-                                            height='24px'
-                                            width='24px'
+                                            height='16px'
+                                            width='16px'
                                             fill='var(--text-general)'
                                         />
                                         <span>{localize('Stats')}</span>

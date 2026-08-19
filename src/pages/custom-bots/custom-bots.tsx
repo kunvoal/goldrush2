@@ -2409,8 +2409,8 @@ const BotCardRow: React.FC<{
         <div 
             onClick={() => onLoad(strat.xml, strat.name, strat)}
             style={{
-                background: isLoaded ? 'rgba(245, 158, 11, 0.20)' : 'rgba(255, 255, 255, 0.025)',
-                border: isLoaded ? '1px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.08)',
+                background: isLoaded ? 'linear-gradient(90deg, rgba(255, 68, 0, 0.38) 0%, rgba(255, 140, 0, 0.22) 100%)' : 'rgba(255, 255, 255, 0.025)',
+                border: isLoaded ? '1px solid #ff5500' : '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '3px',
                 padding: '0 8px',
                 display: 'flex',
@@ -2419,20 +2419,22 @@ const BotCardRow: React.FC<{
                 height: '21px',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
-                boxShadow: isLoaded ? '0 0 8px rgba(245, 158, 11, 0.35)' : 'none',
+                boxShadow: isLoaded ? '0 0 12px rgba(255, 68, 0, 0.65), inset 0 0 8px rgba(255, 140, 0, 0.3)' : 'none',
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)'
             }}
             onMouseOver={(e) => {
                 if (!isLoaded) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                    e.currentTarget.style.background = 'rgba(255, 68, 0, 0.16)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 100, 0, 0.55)';
+                    e.currentTarget.style.boxShadow = '0 0 10px rgba(255, 68, 0, 0.4)';
                 }
             }}
             onMouseOut={(e) => {
                 if (!isLoaded) {
                     e.currentTarget.style.background = 'rgba(255, 255, 255, 0.025)';
                     e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                    e.currentTarget.style.boxShadow = 'none';
                 }
             }}
         >

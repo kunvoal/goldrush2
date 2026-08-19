@@ -69,7 +69,11 @@
                 background: linear-gradient(90deg, #1c0200 0%, #3d0800 50%, #1c0200 100%) !important;
                 border-bottom: 2px solid #ff4500 !important;
                 box-shadow: 0 4px 20px rgba(255, 68, 0, 0.5) !important;
-                justify-content: start;
+                justify-content: start !important;
+                height: 4rem !important;
+                line-height: 4rem !important;
+                align-items: center !important;
+                padding-inline-start: 0.8rem !important;
 
                 @include mobile-or-tablet-screen {
                     overflow-x: auto;
@@ -101,10 +105,33 @@
                 }
             }
 
-            &__item {
+            &__item,
+            &__item--header-fit-content {
                 color: #ffc266 !important;
                 font-weight: 800 !important;
                 transition: all 0.25s ease-in-out !important;
+                padding: 0 1.2rem !important;
+                font-size: 1.15rem !important;
+                height: 3.2rem !important;
+                line-height: 3.2rem !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 5px !important;
+                margin: auto 0.2rem !important;
+                white-space: nowrap !important;
+
+                svg {
+                    width: 16px !important;
+                    height: 16px !important;
+                    flex-shrink: 0 !important;
+                    margin-right: 2px !important;
+                }
+
+                span {
+                    font-size: 1.15rem !important;
+                    font-weight: 800 !important;
+                    letter-spacing: 0.2px !important;
+                }
 
                 &:hover {
                     color: #ffffff !important;
@@ -116,14 +143,13 @@
                 background: linear-gradient(180deg, #ff1a00 0%, #ff7700 100%) !important;
                 color: #ffffff !important;
                 font-weight: 900 !important;
-                box-shadow: 0 0 22px rgba(255, 100, 0, 0.95), inset 0 0 12px rgba(255, 230, 0, 0.7) !important;
-                border-top-left-radius: 8px !important;
-                border-top-right-radius: 8px !important;
-                text-shadow: 0 0 8px #ffffff, 0 0 15px #ffff00 !important;
+                box-shadow: 0 0 18px rgba(255, 100, 0, 0.95), inset 0 0 10px rgba(255, 230, 0, 0.7) !important;
+                border-radius: 6px !important;
+                text-shadow: 0 0 6px #ffffff, 0 0 12px #ffff00 !important;
 
                 svg {
                     fill: #ffffff !important;
-                    filter: drop-shadow(0 0 6px #ffff00) !important;
+                    filter: drop-shadow(0 0 5px #ffff00) !important;
                 }
             }
 
