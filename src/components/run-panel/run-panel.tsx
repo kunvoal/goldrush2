@@ -141,17 +141,21 @@ const DrawerContent = ({ active_index, is_drawer_open, active_tour, setActiveTab
     }, [is_drawer_open, isDesktop]);
 
     return (
-        <>
-            <Tabs active_index={active_index} onTabItemClick={setActiveTabIndex} top>
-                <div id='db-run-panel-tab__transactions' label={<Localize i18n_default_text='Transactions' />}>
-                    <Transactions is_drawer_open={is_drawer_open} />
-                </div>
-                <div id='db-run-panel-tab__journal' label={<Localize i18n_default_text='Journal' />}>
-                    <Journal />
-                </div>
-            </Tabs>
-            {((is_drawer_open && active_index !== 1) || active_tour) && <StatisticsSummary {...props} />}
-        </>
+        <div className='run-panel__content-wrapper' style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <FireSvgOverlay opacity={0.7} />
+            <FireCanvasOverlay opacity={0.65} />
+            <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <Tabs active_index={active_index} onTabItemClick={setActiveTabIndex} top>
+                    <div id='db-run-panel-tab__transactions' label={<Localize i18n_default_text='Transactions' />}>
+                        <Transactions is_drawer_open={is_drawer_open} />
+                    </div>
+                    <div id='db-run-panel-tab__journal' label={<Localize i18n_default_text='Journal' />}>
+                        <Journal />
+                    </div>
+                </Tabs>
+                {((is_drawer_open && active_index !== 1) || active_tour) && <StatisticsSummary {...props} />}
+            </div>
+        </div>
     );
 };
 
@@ -321,9 +325,7 @@ const RunPanel = observer(() => {
 
     return (
         <>
-            <div className={!isDesktop && is_drawer_open ? 'run-panel__container--mobile' : 'run-panel'} style={{ position: 'relative', overflow: 'hidden' }}>
-                <FireSvgOverlay opacity={0.7} />
-                <FireCanvasOverlay opacity={0.65} />
+            <div className={!isDesktop && is_drawer_open ? 'run-panel__container--mobile' : 'run-panel'}>
                 <Drawer
                     anchor='right'
                     className={classNames('run-panel', {

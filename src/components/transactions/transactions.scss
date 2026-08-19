@@ -51,9 +51,10 @@
             margin-top: 0.3rem;
 
             svg {
+                filter: drop-shadow(0 0 10px rgba(255, 120, 0, 0.7));
                 g {
                     path {
-                        fill: var(--text-less-prominent);
+                        fill: #ffaa55 !important;
                     }
                 }
             }
@@ -69,6 +70,9 @@
 
             & .dc-text {
                 line-height: var(--text-lh-xxl);
+                color: #ffffff !important;
+                font-weight: 600;
+                text-shadow: 0 0 8px rgba(255, 68, 0, 0.5);
             }
         }
 
@@ -77,16 +81,18 @@
             margin-left: 2rem;
             font-size: var(--text-size-xxs);
             line-height: var(--text-lh-xl);
-            color: var(--text-less-prominent);
+            color: #ffddbb !important;
         }
     }
 
     &__header {
-        border-bottom: 1px solid var(--general-section-1);
+        border-bottom: 1.5px solid #ff4500 !important;
+        background: linear-gradient(90deg, #260500 0%, #440a00 50%, #260500 100%) !important;
         width: 100%;
         display: grid;
 
         @include typeface(--small-left-bold-black, none);
+        color: #ffeedd !important;
 
         grid-template-columns: $grid-template-columns;
         grid-template-areas: 'type entry-spot exit-spot stake profit';

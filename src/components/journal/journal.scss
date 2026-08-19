@@ -33,9 +33,10 @@
         justify-content: center;
 
         svg {
+            filter: drop-shadow(0 0 10px rgba(255, 120, 0, 0.7));
             g {
                 path {
-                    fill: var(--text-less-prominent);
+                    fill: #ffaa55 !important;
                 }
             }
         }
@@ -53,6 +54,9 @@
 
             & .dc-text {
                 line-height: var(--text-lh-xxl);
+                color: #ffffff !important;
+                font-weight: 600;
+                text-shadow: 0 0 8px rgba(255, 68, 0, 0.5);
             }
         }
 
@@ -60,9 +64,10 @@
             list-style-type: disc;
             margin-left: 20px;
             line-height: var(--text-lh-xl);
+            color: #ffddbb !important;
 
             li::marker {
-                color: var(--text-less-prominent);
+                color: #ff7700 !important;
             }
         }
     }
@@ -84,7 +89,7 @@
     &__data-list {
         .ReactVirtualized__Grid__innerScrollContainer {
             > div:nth-child(even) {
-                background: var(--general-section-2);
+                background: rgba(36, 6, 0, 0.5) !important;
             }
         }
     }
@@ -94,7 +99,11 @@
             display: flex;
             justify-content: space-between;
             padding: 4px 10px;
-            border: solid 1px var(--general-section-1);
+            border-bottom: 1.5px solid #ff4500 !important;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            background: linear-gradient(90deg, #260500 0%, #440a00 50%, #260500 100%) !important;
 
             &-filter {
                 @include flex-center(flex-end);

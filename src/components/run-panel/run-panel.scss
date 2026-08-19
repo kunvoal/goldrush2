@@ -6,10 +6,6 @@
 .run-panel {
     height: 0;
     position: relative;
-    background: rgba(18, 2, 0, 0.55) !important;
-    backdrop-filter: blur(8px) !important;
-    border-left: 2px solid #ff4500 !important;
-    box-shadow: 0 0 35px rgba(255, 68, 0, 0.75), inset 0 0 20px rgba(255, 150, 0, 0.3) !important;
 
     .dc-tabs__list {
         background: linear-gradient(90deg, #3a0800 0%, #661000 50%, #3a0800 100%) !important;
@@ -22,11 +18,28 @@
         text-shadow: 0 0 10px #ff3300 !important;
     }
 
+    .dc-drawer__toggle {
+        background: linear-gradient(180deg, #ff4500 0%, #cc2200 50%, #880000 100%) !important;
+        border-left: 1px solid #ffaa00 !important;
+        border-right: 1px solid #ff3300 !important;
+        box-shadow: -3px 0 12px rgba(255, 68, 0, 0.8) !important;
+        cursor: pointer;
+
+        svg {
+            fill: #ffffff !important;
+            filter: drop-shadow(0 0 4px #ffcc00);
+        }
+    }
+
     &__container {
         height: var(--bot-content-height) !important;
         top: 10.4rem !important;
         width: 50.0rem !important;
         right: 0;
+        background: rgba(18, 2, 0, 0.85) !important;
+        backdrop-filter: blur(12px) !important;
+        border-left: 2px solid #ff4500 !important;
+        box-shadow: -10px 0 35px rgba(255, 68, 0, 0.6), inset 0 0 20px rgba(255, 120, 0, 0.25) !important;
 
         &--mobile {
             position: absolute;
@@ -60,6 +73,7 @@
         &-title {
             min-height: 1.8rem;
             margin-bottom: 4px;
+            color: #ffaa88 !important;
 
             @include typeface(--small-center-bold-black, none);
         }
@@ -67,6 +81,7 @@
         &-content {
             height: 18px;
             margin-bottom: 4px;
+            color: #ffffff !important;
 
             @include typeface(--small-center-normal-black, none);
         }
@@ -77,7 +92,9 @@
 
         flex-direction: column;
         width: 100%;
-        background-color: var(--general-section-2);
+        background: rgba(28, 5, 0, 0.85) !important;
+        border-top: 1px solid rgba(255, 68, 0, 0.4) !important;
+        box-shadow: 0 -2px 10px rgba(255, 68, 0, 0.2) !important;
 
         @include mobile-or-tablet-screen {
             margin: 0;
