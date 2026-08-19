@@ -3,6 +3,8 @@ import React from 'react';
 import { localize } from '@deriv-com/translations';
 import { botNotification } from '@/components/bot-notification/bot-notification';
 import { load } from '@/external/bot-skeleton';
+import { FireCanvasOverlay } from '@/components/fire-canvas-overlay/fire-canvas-overlay';
+import { FireSvgOverlay } from '@/components/fire-svg-overlay/fire-svg-overlay';
 
 // Helper for SL/TP stack inside AFTERPURCHASE_STACK
 const AFTER_PURCHASE_SLT = `
@@ -2409,32 +2411,33 @@ const BotCardRow: React.FC<{
         <div 
             onClick={() => onLoad(strat.xml, strat.name, strat)}
             style={{
-                background: isLoaded ? 'linear-gradient(90deg, rgba(255, 68, 0, 0.38) 0%, rgba(255, 140, 0, 0.22) 100%)' : 'rgba(255, 255, 255, 0.025)',
-                border: isLoaded ? '1px solid #ff5500' : '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '3px',
+                background: isLoaded ? 'linear-gradient(90deg, rgba(255, 68, 0, 0.45) 0%, rgba(255, 140, 0, 0.25) 100%)' : 'rgba(28, 4, 0, 0.82)',
+                border: isLoaded ? '1.5px solid #ff5500' : '1px solid rgba(255, 68, 0, 0.3)',
+                borderRadius: '4px',
                 padding: '0 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                height: '21px',
+                height: '22px',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                boxShadow: isLoaded ? '0 0 12px rgba(255, 68, 0, 0.65), inset 0 0 8px rgba(255, 140, 0, 0.3)' : 'none',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)'
+                transition: 'all 0.18s ease',
+                boxShadow: isLoaded ? '0 0 16px rgba(255, 68, 0, 0.7), inset 0 0 10px rgba(255, 140, 0, 0.35)' : '0 2px 6px rgba(0, 0, 0, 0.4)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                marginBottom: '2px'
             }}
             onMouseOver={(e) => {
                 if (!isLoaded) {
-                    e.currentTarget.style.background = 'rgba(255, 68, 0, 0.16)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 100, 0, 0.55)';
-                    e.currentTarget.style.boxShadow = '0 0 10px rgba(255, 68, 0, 0.4)';
+                    e.currentTarget.style.background = 'rgba(255, 68, 0, 0.22)';
+                    e.currentTarget.style.borderColor = '#ffaa00';
+                    e.currentTarget.style.boxShadow = '0 0 12px rgba(255, 100, 0, 0.55), inset 0 0 8px rgba(255, 140, 0, 0.25)';
                 }
             }}
             onMouseOut={(e) => {
                 if (!isLoaded) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.025)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.background = 'rgba(28, 4, 0, 0.82)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 68, 0, 0.3)';
+                    e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.4)';
                 }
             }}
         >
@@ -2650,233 +2653,288 @@ const CustomBots: React.FC<CustomBotsProps> = ({ handleTabChange }) => {
 
     return (
         <div style={{
-            padding: '2px 4px',
             color: 'var(--text-general)',
             width: '100%',
+            height: 'calc(100vh - 4.4rem)',
+            position: 'relative',
+            overflow: 'hidden',
+            background: 'rgba(14, 2, 0, 0.88)',
             boxSizing: 'border-box',
             fontFamily: 'Inter, sans-serif'
         }}>
-            {/* Top Column Navigation Bar (Snake Light Flowing Directly Through Buttons) */}
-            <div 
-                className="led-snake-nav-flow"
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '4px',
-                    marginBottom: '8px',
-                    width: '100%',
-                    boxSizing: 'border-box'
-                }}
-            >
-                <button
-                    onClick={() => setActiveCategory('favorites')}
+            <FireSvgOverlay opacity={0.65} />
+            <FireCanvasOverlay opacity={0.6} />
+            <div style={{
+                position: 'relative',
+                zIndex: 1,
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                padding: '6px 8px',
+                boxSizing: 'border-box'
+            }}>
+                {/* Top Column Navigation Bar */}
+                <div 
+                    className="led-snake-nav-flow"
                     style={{
-                        background: activeCategory === 'favorites' ? 'rgba(245, 158, 11, 0.45)' : 'rgba(0, 0, 0, 0.35)',
-                        border: activeCategory === 'favorites' ? '1px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.15)',
-                        color: '#ffffff',
-                        padding: '5px 2px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 800,
-                        fontSize: '10px',
-                        letterSpacing: '0.2px',
-                        textTransform: 'uppercase',
-                        transition: 'all 0.15s ease',
-                        whiteSpace: 'nowrap',
-                        flex: '1 1 0px',
-                        textAlign: 'center',
-                        backdropFilter: 'blur(4px)',
-                        boxShadow: activeCategory === 'favorites' ? '0 0 10px rgba(245, 158, 11, 0.6)' : 'none'
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '4px',
+                        marginBottom: '8px',
+                        width: '100%',
+                        boxSizing: 'border-box'
                     }}
                 >
-                    FAVORITES ★
-                </button>
-                <button
-                    onClick={() => setActiveCategory('strictly2tick')}
-                    style={{
-                        background: activeCategory === 'strictly2tick' ? 'rgba(6, 182, 212, 0.45)' : 'rgba(0, 0, 0, 0.35)',
-                        border: activeCategory === 'strictly2tick' ? '1px solid #06b6d4' : '1px solid rgba(255, 255, 255, 0.15)',
-                        color: '#ffffff',
-                        padding: '5px 2px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 800,
-                        fontSize: '10px',
-                        letterSpacing: '0.2px',
-                        textTransform: 'uppercase',
-                        transition: 'all 0.15s ease',
-                        whiteSpace: 'nowrap',
-                        flex: '1 1 0px',
-                        textAlign: 'center',
-                        backdropFilter: 'blur(4px)',
-                        boxShadow: activeCategory === 'strictly2tick' ? '0 0 10px rgba(6, 182, 212, 0.6)' : 'none'
-                    }}
-                >
-                    2 TICKS
-                </button>
-                <button
-                    onClick={() => setActiveCategory('updown')}
-                    style={{
-                        background: activeCategory === 'updown' ? 'rgba(236, 72, 153, 0.25)' : 'rgba(255, 255, 255, 0.03)',
-                        border: activeCategory === 'updown' ? '1px solid #ec4899' : '1px solid rgba(255, 255, 255, 0.1)',
-                        color: activeCategory === 'updown' ? '#ffffff' : 'var(--text-general)',
-                        padding: '4px 2px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        letterSpacing: '0.2px',
-                        textTransform: 'uppercase',
-                        transition: 'all 0.15s ease',
-                        whiteSpace: 'nowrap',
-                        flex: '1 1 0px',
-                        textAlign: 'center'
-                    }}
-                >
-                    UP/DOWN ONLY
-                </button>
-                <button
-                    onClick={() => setActiveCategory('evenodd')}
-                    style={{
-                        background: activeCategory === 'evenodd' ? 'rgba(99, 102, 241, 0.25)' : 'rgba(255, 255, 255, 0.03)',
-                        border: activeCategory === 'evenodd' ? '1px solid #6366f1' : '1px solid rgba(255, 255, 255, 0.1)',
-                        color: activeCategory === 'evenodd' ? '#ffffff' : 'var(--text-general)',
-                        padding: '4px 2px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        letterSpacing: '0.2px',
-                        textTransform: 'uppercase',
-                        transition: 'all 0.15s ease',
-                        whiteSpace: 'nowrap',
-                        flex: '1 1 0px',
-                        textAlign: 'center'
-                    }}
-                >
-                    EVEN/ODD
-                </button>
-                <button
-                    onClick={() => setActiveCategory('matches')}
-                    style={{
-                        background: activeCategory === 'matches' ? 'rgba(108, 99, 255, 0.25)' : 'rgba(255, 255, 255, 0.03)',
-                        border: activeCategory === 'matches' ? '1px solid #6c63ff' : '1px solid rgba(255, 255, 255, 0.1)',
-                        color: activeCategory === 'matches' ? '#ffffff' : 'var(--text-general)',
-                        padding: '4px 2px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        letterSpacing: '0.2px',
-                        textTransform: 'uppercase',
-                        transition: 'all 0.15s ease',
-                        whiteSpace: 'nowrap',
-                        flex: '1 1 0px',
-                        textAlign: 'center'
-                    }}
-                >
-                    MATCHES BOTS
-                </button>
-                <button
-                    onClick={() => setActiveCategory('matches_reloaded')}
-                    style={{
-                        background: activeCategory === 'matches_reloaded' ? 'rgba(168, 85, 247, 0.25)' : 'rgba(255, 255, 255, 0.03)',
-                        border: activeCategory === 'matches_reloaded' ? '1px solid #a855f7' : '1px solid rgba(255, 255, 255, 0.1)',
-                        color: activeCategory === 'matches_reloaded' ? '#ffffff' : 'var(--text-general)',
-                        padding: '4px 2px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        letterSpacing: '0.2px',
-                        textTransform: 'uppercase',
-                        transition: 'all 0.15s ease',
-                        whiteSpace: 'nowrap',
-                        flex: '1 1 0px',
-                        textAlign: 'center'
-                    }}
-                >
-                    MATCHES RELOADED
-                </button>
-                <button
-                    onClick={() => setActiveCategory('blends')}
-                    style={{
-                        background: activeCategory === 'blends' ? 'rgba(138, 43, 226, 0.25)' : 'rgba(255, 255, 255, 0.03)',
-                        border: activeCategory === 'blends' ? '1px solid #8a2be2' : '1px solid rgba(255, 255, 255, 0.1)',
-                        color: activeCategory === 'blends' ? '#ffffff' : 'var(--text-general)',
-                        padding: '4px 2px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        letterSpacing: '0.2px',
-                        textTransform: 'uppercase',
-                        transition: 'all 0.15s ease',
-                        whiteSpace: 'nowrap',
-                        flex: '1 1 0px',
-                        textAlign: 'center'
-                    }}
-                >
-                    OV/UN BLENDS
-                </button>
-                <button
-                    onClick={() => setActiveCategory('maxing')}
-                    style={{
-                        background: activeCategory === 'maxing' ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255, 255, 255, 0.03)',
-                        border: activeCategory === 'maxing' ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.1)',
-                        color: activeCategory === 'maxing' ? '#ffffff' : 'var(--text-general)',
-                        padding: '4px 2px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        letterSpacing: '0.2px',
-                        textTransform: 'uppercase',
-                        transition: 'all 0.15s ease',
-                        whiteSpace: 'nowrap',
-                        flex: '1 1 0px',
-                        textAlign: 'center'
-                    }}
-                >
-                    MAXING BOTS
-                </button>
-                <button
-                    onClick={() => setActiveCategory('multilegs')}
-                    style={{
-                        background: activeCategory === 'multilegs' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255, 255, 255, 0.03)',
-                        border: activeCategory === 'multilegs' ? '1px solid #ef4444' : '1px solid rgba(255, 255, 255, 0.1)',
-                        color: activeCategory === 'multilegs' ? '#ffffff' : 'var(--text-general)',
-                        padding: '4px 2px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 700,
-                        fontSize: '10px',
-                        letterSpacing: '0.2px',
-                        textTransform: 'uppercase',
-                        transition: 'all 0.15s ease',
-                        whiteSpace: 'nowrap',
-                        flex: '1 1 0px',
-                        textAlign: 'center'
-                    }}
-                >
-                    MULTILEGS
-                </button>
-                <button
-                    onClick={() => setActiveCategory('power')}
-                    style={{
-                        background: activeCategory === 'power' ? 'rgba(245, 158, 11, 0.25)' : 'rgba(255, 255, 255, 0.03)',
-                        border: activeCategory === 'power' ? '1px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.1)',
-                        color: activeCategory === 'power' ? '#ffffff' : 'var(--text-general)',
-                        letterSpacing: '0.3px',
-                        textTransform: 'uppercase',
-                        transition: 'all 0.15s ease',
-                        whiteSpace: 'nowrap'
-                    }}
-                >
-                    POWER STRATS
-                </button>
-            </div>
+                    <button
+                        onClick={() => setActiveCategory('favorites')}
+                        style={{
+                            background: activeCategory === 'favorites' ? 'linear-gradient(180deg, #ff1a00 0%, #ff7700 100%)' : 'rgba(28, 4, 0, 0.8)',
+                            border: activeCategory === 'favorites' ? '1px solid #ffcc00' : '1px solid rgba(255, 68, 0, 0.35)',
+                            color: '#ffffff',
+                            padding: '5px 2px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 800,
+                            fontSize: '10px',
+                            letterSpacing: '0.2px',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            flex: '1 1 0px',
+                            textAlign: 'center',
+                            backdropFilter: 'blur(6px)',
+                            boxShadow: activeCategory === 'favorites' ? '0 0 14px rgba(255, 100, 0, 0.95), inset 0 0 8px rgba(255, 230, 0, 0.7)' : 'none',
+                            textShadow: activeCategory === 'favorites' ? '0 0 6px #ffffff, 0 0 10px #ffff00' : 'none'
+                        }}
+                    >
+                        FAVORITES ★
+                    </button>
+                    <button
+                        onClick={() => setActiveCategory('strictly2tick')}
+                        style={{
+                            background: activeCategory === 'strictly2tick' ? 'linear-gradient(180deg, #ff1a00 0%, #ff7700 100%)' : 'rgba(28, 4, 0, 0.8)',
+                            border: activeCategory === 'strictly2tick' ? '1px solid #ffcc00' : '1px solid rgba(255, 68, 0, 0.35)',
+                            color: '#ffffff',
+                            padding: '5px 2px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 800,
+                            fontSize: '10px',
+                            letterSpacing: '0.2px',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            flex: '1 1 0px',
+                            textAlign: 'center',
+                            backdropFilter: 'blur(6px)',
+                            boxShadow: activeCategory === 'strictly2tick' ? '0 0 14px rgba(255, 100, 0, 0.95), inset 0 0 8px rgba(255, 230, 0, 0.7)' : 'none',
+                            textShadow: activeCategory === 'strictly2tick' ? '0 0 6px #ffffff, 0 0 10px #ffff00' : 'none'
+                        }}
+                    >
+                        2 TICKS
+                    </button>
+                    <button
+                        onClick={() => setActiveCategory('updown')}
+                        style={{
+                            background: activeCategory === 'updown' ? 'linear-gradient(180deg, #ff1a00 0%, #ff7700 100%)' : 'rgba(28, 4, 0, 0.8)',
+                            border: activeCategory === 'updown' ? '1px solid #ffcc00' : '1px solid rgba(255, 68, 0, 0.35)',
+                            color: '#ffffff',
+                            padding: '5px 2px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 800,
+                            fontSize: '10px',
+                            letterSpacing: '0.2px',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            flex: '1 1 0px',
+                            textAlign: 'center',
+                            backdropFilter: 'blur(6px)',
+                            boxShadow: activeCategory === 'updown' ? '0 0 14px rgba(255, 100, 0, 0.95), inset 0 0 8px rgba(255, 230, 0, 0.7)' : 'none',
+                            textShadow: activeCategory === 'updown' ? '0 0 6px #ffffff, 0 0 10px #ffff00' : 'none'
+                        }}
+                    >
+                        UP/DOWN ONLY
+                    </button>
+                    <button
+                        onClick={() => setActiveCategory('evenodd')}
+                        style={{
+                            background: activeCategory === 'evenodd' ? 'linear-gradient(180deg, #ff1a00 0%, #ff7700 100%)' : 'rgba(28, 4, 0, 0.8)',
+                            border: activeCategory === 'evenodd' ? '1px solid #ffcc00' : '1px solid rgba(255, 68, 0, 0.35)',
+                            color: '#ffffff',
+                            padding: '5px 2px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 800,
+                            fontSize: '10px',
+                            letterSpacing: '0.2px',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            flex: '1 1 0px',
+                            textAlign: 'center',
+                            backdropFilter: 'blur(6px)',
+                            boxShadow: activeCategory === 'evenodd' ? '0 0 14px rgba(255, 100, 0, 0.95), inset 0 0 8px rgba(255, 230, 0, 0.7)' : 'none',
+                            textShadow: activeCategory === 'evenodd' ? '0 0 6px #ffffff, 0 0 10px #ffff00' : 'none'
+                        }}
+                    >
+                        EVEN/ODD
+                    </button>
+                    <button
+                        onClick={() => setActiveCategory('matches')}
+                        style={{
+                            background: activeCategory === 'matches' ? 'linear-gradient(180deg, #ff1a00 0%, #ff7700 100%)' : 'rgba(28, 4, 0, 0.8)',
+                            border: activeCategory === 'matches' ? '1px solid #ffcc00' : '1px solid rgba(255, 68, 0, 0.35)',
+                            color: '#ffffff',
+                            padding: '5px 2px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 800,
+                            fontSize: '10px',
+                            letterSpacing: '0.2px',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            flex: '1 1 0px',
+                            textAlign: 'center',
+                            backdropFilter: 'blur(6px)',
+                            boxShadow: activeCategory === 'matches' ? '0 0 14px rgba(255, 100, 0, 0.95), inset 0 0 8px rgba(255, 230, 0, 0.7)' : 'none',
+                            textShadow: activeCategory === 'matches' ? '0 0 6px #ffffff, 0 0 10px #ffff00' : 'none'
+                        }}
+                    >
+                        MATCHES BOTS
+                    </button>
+                    <button
+                        onClick={() => setActiveCategory('matches_reloaded')}
+                        style={{
+                            background: activeCategory === 'matches_reloaded' ? 'linear-gradient(180deg, #ff1a00 0%, #ff7700 100%)' : 'rgba(28, 4, 0, 0.8)',
+                            border: activeCategory === 'matches_reloaded' ? '1px solid #ffcc00' : '1px solid rgba(255, 68, 0, 0.35)',
+                            color: '#ffffff',
+                            padding: '5px 2px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 800,
+                            fontSize: '10px',
+                            letterSpacing: '0.2px',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            flex: '1 1 0px',
+                            textAlign: 'center',
+                            backdropFilter: 'blur(6px)',
+                            boxShadow: activeCategory === 'matches_reloaded' ? '0 0 14px rgba(255, 100, 0, 0.95), inset 0 0 8px rgba(255, 230, 0, 0.7)' : 'none',
+                            textShadow: activeCategory === 'matches_reloaded' ? '0 0 6px #ffffff, 0 0 10px #ffff00' : 'none'
+                        }}
+                    >
+                        MATCHES RELOADED
+                    </button>
+                    <button
+                        onClick={() => setActiveCategory('blends')}
+                        style={{
+                            background: activeCategory === 'blends' ? 'linear-gradient(180deg, #ff1a00 0%, #ff7700 100%)' : 'rgba(28, 4, 0, 0.8)',
+                            border: activeCategory === 'blends' ? '1px solid #ffcc00' : '1px solid rgba(255, 68, 0, 0.35)',
+                            color: '#ffffff',
+                            padding: '5px 2px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 800,
+                            fontSize: '10px',
+                            letterSpacing: '0.2px',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            flex: '1 1 0px',
+                            textAlign: 'center',
+                            backdropFilter: 'blur(6px)',
+                            boxShadow: activeCategory === 'blends' ? '0 0 14px rgba(255, 100, 0, 0.95), inset 0 0 8px rgba(255, 230, 0, 0.7)' : 'none',
+                            textShadow: activeCategory === 'blends' ? '0 0 6px #ffffff, 0 0 10px #ffff00' : 'none'
+                        }}
+                    >
+                        OV/UN BLENDS
+                    </button>
+                    <button
+                        onClick={() => setActiveCategory('maxing')}
+                        style={{
+                            background: activeCategory === 'maxing' ? 'linear-gradient(180deg, #ff1a00 0%, #ff7700 100%)' : 'rgba(28, 4, 0, 0.8)',
+                            border: activeCategory === 'maxing' ? '1px solid #ffcc00' : '1px solid rgba(255, 68, 0, 0.35)',
+                            color: '#ffffff',
+                            padding: '5px 2px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 800,
+                            fontSize: '10px',
+                            letterSpacing: '0.2px',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            flex: '1 1 0px',
+                            textAlign: 'center',
+                            backdropFilter: 'blur(6px)',
+                            boxShadow: activeCategory === 'maxing' ? '0 0 14px rgba(255, 100, 0, 0.95), inset 0 0 8px rgba(255, 230, 0, 0.7)' : 'none',
+                            textShadow: activeCategory === 'maxing' ? '0 0 6px #ffffff, 0 0 10px #ffff00' : 'none'
+                        }}
+                    >
+                        MAXING BOTS
+                    </button>
+                    <button
+                        onClick={() => setActiveCategory('multilegs')}
+                        style={{
+                            background: activeCategory === 'multilegs' ? 'linear-gradient(180deg, #ff1a00 0%, #ff7700 100%)' : 'rgba(28, 4, 0, 0.8)',
+                            border: activeCategory === 'multilegs' ? '1px solid #ffcc00' : '1px solid rgba(255, 68, 0, 0.35)',
+                            color: '#ffffff',
+                            padding: '5px 2px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 800,
+                            fontSize: '10px',
+                            letterSpacing: '0.2px',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            flex: '1 1 0px',
+                            textAlign: 'center',
+                            backdropFilter: 'blur(6px)',
+                            boxShadow: activeCategory === 'multilegs' ? '0 0 14px rgba(255, 100, 0, 0.95), inset 0 0 8px rgba(255, 230, 0, 0.7)' : 'none',
+                            textShadow: activeCategory === 'multilegs' ? '0 0 6px #ffffff, 0 0 10px #ffff00' : 'none'
+                        }}
+                    >
+                        MULTILEGS
+                    </button>
+                    <button
+                        onClick={() => setActiveCategory('power')}
+                        style={{
+                            background: activeCategory === 'power' ? 'linear-gradient(180deg, #ff1a00 0%, #ff7700 100%)' : 'rgba(28, 4, 0, 0.8)',
+                            border: activeCategory === 'power' ? '1px solid #ffcc00' : '1px solid rgba(255, 68, 0, 0.35)',
+                            color: '#ffffff',
+                            padding: '5px 2px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 800,
+                            fontSize: '10px',
+                            letterSpacing: '0.3px',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            flex: '1 1 0px',
+                            textAlign: 'center',
+                            backdropFilter: 'blur(6px)',
+                            boxShadow: activeCategory === 'power' ? '0 0 14px rgba(255, 100, 0, 0.95), inset 0 0 8px rgba(255, 230, 0, 0.7)' : 'none',
+                            textShadow: activeCategory === 'power' ? '0 0 6px #ffffff, 0 0 10px #ffff00' : 'none'
+                        }}
+                    >
+                        POWER STRATS
+                    </button>
+                </div>
+
+                {/* Scrollable Strategy List with Fiery Theme */}
+                <div style={{
+                    flex: 1,
+                    overflowY: 'auto',
+                    paddingRight: '2px',
+                    scrollbarWidth: 'thin'
+                }}>
 
             {/* Column -1: FAVORITES (Saved Bots) */}
             {activeCategory === 'favorites' && (
@@ -2884,16 +2942,17 @@ const CustomBots: React.FC<CustomBotsProps> = ({ handleTabChange }) => {
                     {favoritedBotObjects.length === 0 ? (
                         <div style={{
                             textAlign: 'center',
-                            padding: '26px 20px',
-                            background: 'rgba(255, 255, 255, 0.02)',
-                            border: '1px solid rgba(255, 255, 255, 0.08)',
-                            borderRadius: '6px',
-                            color: 'var(--text-less-prominent)',
-                            fontSize: '12px'
+                            padding: '40px 20px',
+                            background: 'rgba(26, 4, 0, 0.85)',
+                            border: '1.5px solid #ff4500',
+                            borderRadius: '12px',
+                            boxShadow: '0 0 25px rgba(255, 68, 0, 0.5), inset 0 0 15px rgba(255, 120, 0, 0.2)',
+                            color: '#ffddbb',
+                            fontSize: '13px'
                         }}>
-                            <div style={{ fontSize: '24px', marginBottom: '6px', color: '#f59e0b' }}>★</div>
-                            <div style={{ fontWeight: 700, color: 'var(--text-general)', marginBottom: '4px', fontSize: '13px' }}>No Favorited Bots Yet</div>
-                            <div>Click the star icon (☆) next to any strategy in the other tabs to save your favorite bots here!</div>
+                            <div style={{ fontSize: '36px', marginBottom: '10px', color: '#ffaa00', filter: 'drop-shadow(0 0 12px rgba(255, 170, 0, 0.9))' }}>★</div>
+                            <div style={{ fontWeight: 800, color: '#ffffff', marginBottom: '6px', fontSize: '16px', textShadow: '0 0 10px rgba(255, 68, 0, 0.8)' }}>No Favorited Bots Yet</div>
+                            <div style={{ color: '#ffccaa', fontSize: '13px' }}>Click the star icon (☆) next to any strategy in the other tabs to save your favorite bots here!</div>
                         </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -3065,6 +3124,8 @@ const CustomBots: React.FC<CustomBotsProps> = ({ handleTabChange }) => {
                     ))}
                 </div>
             )}
+                </div>
+            </div>
         </div>
     );
 };
