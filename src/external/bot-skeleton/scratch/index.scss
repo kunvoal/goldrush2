@@ -1422,6 +1422,7 @@ g.editing .blocklyEditableText {
     border-bottom: 2.5px solid #06b6d4 !important;
     box-shadow: 0 0 18px rgba(6, 182, 212, 0.65), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
     border-radius: 6px 6px 0 0;
+    justify-content: flex-start !important;
 }
 
 .dc-tabs__item,
@@ -1429,6 +1430,8 @@ g.editing .blocklyEditableText {
     color: #ffffff !important;
     font-weight: 800 !important;
     transition: all 0.2s ease !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
 
     &:hover {
         background: rgba(255, 255, 255, 0.2) !important;
