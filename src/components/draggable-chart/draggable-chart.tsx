@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
+import ChartWrapper from '../../pages/chart/chart-wrapper';
 import { useStore } from '@/hooks/useStore';
 import { api_base } from '@/external/bot-skeleton';
 
@@ -69,7 +70,7 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
         return () => observer.disconnect();
     }, [isOpen, isMinimized]);
 
-    // WebSocket Historical & Live Tick Stream
+    // WebSocket Historical & Live Tick Stream (tracks active symbol from SmartChart)
     useEffect(() => {
         if (!isOpen) return;
 
@@ -177,6 +178,7 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
 
     const handleMouseUp = () => {
         setIsDragging(false);
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
     };
 
     useEffect(() => {
@@ -206,14 +208,14 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
         return ticks.slice(-maxVisibleTicks);
     }, [ticks, maxVisibleTicks]);
 
-    // Compute Chart Geometry & Crest/Trough Points
+    // Compute Chart Geometry & Crest/Trough Points aligned to SmartChart canvas
     const chartGeometry = useMemo(() => {
         if (visibleTicks.length < 2) {
-            return { points: [], linePath: '', areaPath: '', minPrice: 0, maxPrice: 0, priceGrid: [] };
+            return { points: [] };
         }
 
-        const paddingLeft = 60;
-        const paddingRight = 35;
+        const paddingLeft = 85;
+        const paddingRight = 65;
         const paddingTop = 60;
         const paddingBottom = 40;
 
@@ -261,25 +263,7 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
             };
         });
 
-        // Build SVG Polyline Path
-        const linePath = points.reduce((acc, p, i) => {
-            return `${acc} ${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
-        }, '');
-
-        // Build SVG Gradient Area Path
-        const lastP = points[points.length - 1];
-        const firstP = points[0];
-        const areaBottom = containerSize.height - paddingBottom;
-        const areaPath = `${linePath} L ${lastP.x.toFixed(1)} ${areaBottom} L ${firstP.x.toFixed(1)} ${areaBottom} Z`;
-
-        // Price Grid Lines (4 horizontal reference prices)
-        const priceGrid = [0, 0.33, 0.66, 1].map(ratio => {
-            const priceVal = maxPrice - ratio * priceRange;
-            const yPos = paddingTop + ratio * plotHeight;
-            return { price: priceVal.toFixed(2), y: yPos };
-        });
-
-        return { points, linePath, areaPath, minPrice, maxPrice, priceGrid };
+        return { points };
     }, [visibleTicks, containerSize, selectedStride]);
 
     if (!isOpen) return null;
@@ -427,6 +411,7 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
                         className="draggable-chart-control"
                         onClick={() => {
                             setIsMinimized(!isMinimized);
+                            setTimeout(() => window.dispatchEvent(new Event('resize')), 150);
                         }}
                         style={{
                             background: 'rgba(255, 255, 255, 0.15)',
@@ -581,7 +566,7 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
                 </div>
             )}
 
-            {/* Rolling Line Graph Body with Crest & Trough Digits */}
+            {/* SmartCharts Champion Engine Container with Live Crest/Trough Digits Overlay */}
             {!isMinimized && (
                 <div
                     ref={chartCanvasRef}
@@ -594,163 +579,32 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
                         background: '#0d1117'
                     }}
                 >
-                    {/* Left Drawing Tools Sidebar (From Upload Image) */}
-                    <div
-                        style={{
-                            position: 'absolute',
-                            left: '12px',
-                            top: '110px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '8px',
-                            background: 'rgba(22, 27, 34, 0.85)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: '6px',
-                            padding: '6px 4px',
-                            zIndex: 30,
-                            backdropFilter: 'blur(8px)'
-                        }}
-                    >
-                        <div style={{ padding: '4px', color: '#94a3b8', fontSize: '11px', fontWeight: 800, textAlign: 'center', cursor: 'pointer' }} title="Tick Duration">1T</div>
-                        <div style={{ padding: '4px', color: '#94a3b8', fontSize: '12px', textAlign: 'center', cursor: 'pointer' }} title="Chart Type">📈</div>
-                        <div style={{ padding: '4px', color: '#94a3b8', fontSize: '12px', textAlign: 'center', cursor: 'pointer' }} title="Indicators">📊</div>
-                        <div style={{ padding: '4px', color: '#94a3b8', fontSize: '12px', textAlign: 'center', cursor: 'pointer' }} title="Draw">✏️</div>
-                        <div style={{ padding: '4px', color: '#94a3b8', fontSize: '12px', textAlign: 'center', cursor: 'pointer' }} title="Export">💾</div>
-                        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', margin: '2px 0' }} />
-                        <div style={{ padding: '2px', color: '#94a3b8', fontSize: '13px', fontWeight: 900, textAlign: 'center', cursor: 'pointer' }} title="Zoom In">+</div>
-                        <div style={{ padding: '2px', color: '#94a3b8', fontSize: '13px', fontWeight: 900, textAlign: 'center', cursor: 'pointer' }} title="Zoom Out">−</div>
+                    {/* 1. Official SmartCharts Default Engine (Deriv Volatility Dropdown, Line Chart, Tools, Zoom, Pan) */}
+                    <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, zIndex: 1 }}>
+                        <ChartWrapper show_digits_stats={false} />
                     </div>
 
-                    {/* Top Left Symbol Info Card (From Upload Image) */}
-                    <div
-                        style={{
-                            position: 'absolute',
-                            left: '12px',
-                            top: '12px',
-                            background: 'rgba(22, 27, 34, 0.92)',
-                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                            borderRadius: '8px',
-                            padding: '8px 14px',
-                            zIndex: 30,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '2px',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
-                        }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span style={{ background: '#ef4444', color: '#ffffff', fontSize: '8px', fontWeight: 900, padding: '1px 3px', borderRadius: '2px' }}>100 1s</span>
-                            <span style={{ color: '#ffffff', fontSize: '13px', fontWeight: 800 }}>Volatility 100 (1s) Index</span>
-                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px' }}>▼</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                            <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 900 }}>{lastTick.quote}</span>
-                            <span style={{ color: lastTick.diff >= 0 ? '#10b981' : '#ef4444', fontSize: '11px', fontWeight: 700 }}>
-                                {lastTick.diff >= 0 ? `+${lastTick.diff}` : lastTick.diff} ({lastTick.diff >= 0 ? '+0.01%' : '-0.01%'}) {lastTick.diff >= 0 ? '▲' : '▼'}
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* SVG Rolling Line Graph Canvas */}
+                    {/* 2. Floating Crest and Trough Digits Overlay Layer (Pointer Events None so all SmartChart interactions work 100%) */}
                     <svg
                         style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
                             width: '100%',
                             height: '100%',
+                            zIndex: 5,
+                            pointerEvents: 'none',
                             display: 'block'
                         }}
                     >
                         <defs>
-                            <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.10" />
-                                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.0" />
-                            </linearGradient>
-                            <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
-                                <feGaussianBlur stdDeviation="3" result="blur" />
-                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            <filter id="digitDropShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#000000" floodOpacity="0.95" />
                             </filter>
                         </defs>
 
-                        {/* Background Grid Lines & Y-Axis Labels */}
-                        {chartGeometry.priceGrid.map((grid, idx) => (
-                            <g key={idx}>
-                                <line
-                                    x1="55"
-                                    y1={grid.y}
-                                    x2={containerSize.width}
-                                    y2={grid.y}
-                                    stroke="rgba(255, 255, 255, 0.05)"
-                                    strokeDasharray="4 4"
-                                />
-                                <text
-                                    x={containerSize.width - 8}
-                                    y={grid.y - 4}
-                                    fill="rgba(148, 163, 184, 0.6)"
-                                    fontSize="10"
-                                    fontWeight="600"
-                                    textAnchor="end"
-                                    fontFamily="Inter, sans-serif"
-                                >
-                                    {grid.price}
-                                </text>
-                            </g>
-                        ))}
-
-                        {/* Gradient Area under Line */}
-                        {chartGeometry.areaPath && (
-                            <path
-                                d={chartGeometry.areaPath}
-                                fill="url(#chartAreaGradient)"
-                            />
-                        )}
-
-                        {/* Main Rolling Line Path */}
-                        {chartGeometry.linePath && (
-                            <path
-                                d={chartGeometry.linePath}
-                                fill="none"
-                                stroke="#d1d5db"
-                                strokeWidth="2.2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                filter="drop-shadow(0 0 3px rgba(255,255,255,0.45))"
-                            />
-                        )}
-
-                        {/* Live Spot Horizontal Reference Line & Pulsing Dot */}
-                        {chartGeometry.points.length > 0 && (() => {
-                            const lastP = chartGeometry.points[chartGeometry.points.length - 1];
-                            return (
-                                <g>
-                                    <line
-                                        x1={lastP.x}
-                                        y1={lastP.y}
-                                        x2={containerSize.width}
-                                        y2={lastP.y}
-                                        stroke="#ffffff"
-                                        strokeWidth="1.8"
-                                        strokeDasharray="3 3"
-                                        opacity="0.85"
-                                    />
-                                    <circle
-                                        cx={lastP.x}
-                                        cy={lastP.y}
-                                        r="6"
-                                        fill="#ffffff"
-                                        filter="drop-shadow(0 0 10px #ffffff)"
-                                    />
-                                    <circle
-                                        cx={lastP.x}
-                                        cy={lastP.y}
-                                        r="2.5"
-                                        fill="#0f172a"
-                                    />
-                                </g>
-                            );
-                        })()}
-
                         {/* Crest & Trough Digits Populated Along the Rolling Graph */}
                         {chartGeometry.points.map((p, idx) => {
-                            // Filter highlight rules
                             const isEven = p.digit % 2 === 0;
                             let isHighlighted = true;
                             let digitColor = '#ffffff';
@@ -761,15 +615,15 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
                                 digitColor = isEven ? '#10b981' : '#ef4444';
                             } else if (hudMode === 'matches') {
                                 isHighlighted = p.digit === matchesDigit;
-                                digitColor = isHighlighted ? '#ffaa00' : 'rgba(255, 255, 255, 0.4)';
+                                digitColor = isHighlighted ? '#ffaa00' : 'rgba(255, 255, 255, 0.35)';
                             } else if (hudMode === 'overunder') {
                                 isHighlighted = overUnderType === 'UNDER' ? p.digit < overUnderThreshold : p.digit > overUnderThreshold;
-                                digitColor = isHighlighted ? '#10b981' : 'rgba(255, 255, 255, 0.4)';
+                                digitColor = isHighlighted ? '#10b981' : 'rgba(255, 255, 255, 0.35)';
                             }
 
                             if (!isHighlighted) return null;
 
-                            // If point is a Crest (Peak): Place above the vertex
+                            // Peak / Crest: Display above apex
                             if (p.isCrest) {
                                 return (
                                     <g key={`crest_${idx}`}>
@@ -781,10 +635,7 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
                                             fontWeight="900"
                                             textAnchor="middle"
                                             fontFamily="Inter, sans-serif"
-                                            style={{
-                                                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.95))',
-                                                userSelect: 'none'
-                                            }}
+                                            filter="url(#digitDropShadow)"
                                         >
                                             {p.digit}
                                         </text>
@@ -792,7 +643,7 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
                                 );
                             }
 
-                            // If point is a Trough (Valley): Place below the vertex
+                            // Valley / Trough: Display below apex
                             if (p.isTrough) {
                                 return (
                                     <g key={`trough_${idx}`}>
@@ -804,10 +655,7 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
                                             fontWeight="900"
                                             textAnchor="middle"
                                             fontFamily="Inter, sans-serif"
-                                            style={{
-                                                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.95))',
-                                                userSelect: 'none'
-                                            }}
+                                            filter="url(#digitDropShadow)"
                                         >
                                             {p.digit}
                                         </text>
@@ -815,7 +663,7 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
                                 );
                             }
 
-                            // Inflection / step run point
+                            // Stride run point
                             if (p.isInflection) {
                                 return (
                                     <g key={`inflection_${idx}`}>
@@ -827,11 +675,8 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
                                             fontWeight="800"
                                             textAnchor="middle"
                                             fontFamily="Inter, sans-serif"
-                                            style={{
-                                                filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.9))',
-                                                userSelect: 'none',
-                                                opacity: 0.85
-                                            }}
+                                            filter="url(#digitDropShadow)"
+                                            opacity="0.85"
                                         >
                                             {p.digit}
                                         </text>
@@ -843,30 +688,9 @@ export const DraggableChartOverlay: React.FC<DraggableChartProps> = observer(({ 
                         })}
                     </svg>
 
-                    {/* Bottom Status Bar (Live GMT time and mode indicators) */}
-                    <div
-                        style={{
-                            position: 'absolute',
-                            bottom: '8px',
-                            right: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            fontSize: '10px',
-                            fontWeight: 700,
-                            color: 'rgba(255, 255, 255, 0.45)',
-                            pointerEvents: 'none'
-                        }}
-                    >
-                        <span style={{ color: '#06b6d4' }}>●</span>
-                        <span>{new Date().toISOString().replace('T', ' ').slice(0, 19)} GMT</span>
-                        <span>🌙</span>
-                        <span>🔲</span>
-                    </div>
-
                     {/* Parity Ratio Footer HUD (Active in EVENODD) */}
                     {hudMode === 'evenodd' && (
-                        <div style={{ position: 'absolute', bottom: '30px', left: '70px', right: '70px', background: 'rgba(15, 23, 42, 0.94)', padding: '5px 12px', borderRadius: '6px', border: '1px solid #ff4500', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ position: 'absolute', bottom: '25px', left: '70px', right: '70px', background: 'rgba(15, 23, 42, 0.94)', padding: '5px 12px', borderRadius: '6px', border: '1px solid #ff4500', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between', pointerEvents: 'auto' }}>
                             <span style={{ fontSize: '10px', fontWeight: 900, color: '#10b981' }}>EVEN: {evenPct}%</span>
                             <div style={{ flex: 1, height: '8px', background: '#ef4444', borderRadius: '4px', margin: '0 12px', overflow: 'hidden', display: 'flex' }}>
                                 <div style={{ width: `${evenPct}%`, background: '#10b981', height: '100%', transition: 'width 0.4s ease' }} />
