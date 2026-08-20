@@ -27,18 +27,25 @@ export default function StatsView() {
   const [timeHistory, setTimeHistory] = useState<number[]>([]);
   const [digits, setDigits] = useState<number[]>([]);
 
+  const currentAssetRef = useRef(selectedAsset);
+  useEffect(() => {
+    currentAssetRef.current = selectedAsset;
+  }, [selectedAsset]);
+
   useEffect(() => {
     if (!api_base?.api) return;
 
+    // Instantly wipe quotes for new symbol to prevent mixed price scales
     setHistory([]);
     setTimeHistory([]);
     setDigits([]);
 
     let sub: any = null;
+    const targetSymbol = selectedAsset;
 
     try {
       api_base.api.send({
-        ticks_history: selectedAsset,
+        ticks_history: targetSymbol,
         count: 1000,
         end: 'latest',
         style: 'ticks',
@@ -49,22 +56,39 @@ export default function StatsView() {
     }
 
     sub = api_base.api.onMessage()?.subscribe(({ data }: any) => {
+      // Strictly ignore messages if user has switched away to another symbol
+      if (currentAssetRef.current !== targetSymbol) return;
+
       if (data?.msg_type === 'history' && data?.history) {
-        const prices: number[] = data.history.prices || [];
-        const times: number[] = data.history.times || [];
+        if (data?.echo_req?.ticks_history && data.echo_req.ticks_history !== targetSymbol) {
+          return;
+        }
+        const prices: number[] = (data.history.prices || []).map((p: any) => Number(p));
+        const times: number[] = (data.history.times || []).map((t: any) => Number(t));
 
         setHistory(prices);
         setTimeHistory(times.map(t => t * 1000));
-        setDigits(prices.map(p => parseInt(p.toFixed(2).slice(-1), 10)));
+        setDigits(prices.map(p => parseInt(Number(p).toFixed(2).slice(-1), 10)));
       }
 
-      if (data?.msg_type === 'tick' && data?.tick && data.tick.symbol === selectedAsset) {
+      if (data?.msg_type === 'tick' && data?.tick && data.tick.symbol === targetSymbol) {
         const quote = Number(data.tick.quote);
         const epoch = (data.tick.epoch || Date.now() / 1000) * 1000;
         const d = parseInt(quote.toFixed(2).slice(-1), 10);
 
-        setHistory(prev => [...prev.slice(-999), quote]);
-        setTimeHistory(prev => [...prev.slice(-999), epoch]);
+        setHistory(prev => {
+          // If prev contains quotes from previous symbol with drastically different scale, discard old
+          if (prev.length > 0 && Math.abs(prev[prev.length - 1] - quote) > quote * 0.5) {
+            return [quote];
+          }
+          return [...prev.slice(-999), quote];
+        });
+        setTimeHistory(prev => {
+          if (prev.length > 0 && prev.length !== history.length) {
+            return [epoch];
+          }
+          return [...prev.slice(-999), epoch];
+        });
         setDigits(prev => [...prev.slice(-999), d]);
       }
     });
@@ -87,23 +111,27 @@ export default function StatsView() {
   const oddCount = totalDigits - evenCount;
   const evenPct = Math.round((evenCount / totalDigits) * 100);
   const oddPct = 100 - evenPct;
-  const lastQuote = history.length > 0 ? history[history.length - 1].toFixed(2) : '---';
+
+  // Determine dynamic formatting precision from quotes
+  const sampleQuote = history.length > 0 ? history[history.length - 1] : 0;
+  const decCount = sampleQuote.toString().split('.')[1]?.length || 2;
+  const precision = Math.min(4, Math.max(2, decCount));
+  const lastQuote = history.length > 0 ? history[history.length - 1].toFixed(precision) : '---';
 
   return (
     <div
       style={{
         width: '100%',
-        height: 'calc(100vh - 165px)',
-        maxHeight: 'calc(100vh - 165px)',
-        minHeight: '380px',
-        padding: isMobile ? '4px' : '8px 16px',
+        height: '100%',
+        maxHeight: '100%',
         boxSizing: 'border-box',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'stretch',
         background: '#090d16',
         overflow: 'hidden',
-        fontFamily: 'Inter, sans-serif'
+        fontFamily: 'Inter, sans-serif',
+        padding: isMobile ? '4px 6px' : '6px 14px'
       }}
     >
       {/* Centered Main Stats Dashboard Card */}
@@ -112,6 +140,7 @@ export default function StatsView() {
           width: '100%',
           maxWidth: '1280px',
           height: '100%',
+          maxHeight: '100%',
           background: '#0d1117',
           border: '1.5px solid #ff4500',
           borderRadius: '8px',
@@ -128,7 +157,7 @@ export default function StatsView() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: isMobile ? '6px 10px' : '8px 14px',
+            padding: isMobile ? '4px 8px' : '6px 12px',
             background: 'linear-gradient(90deg, #1c0200 0%, #3d0800 50%, #1c0200 100%)',
             borderBottom: '1.5px solid rgba(255, 68, 0, 0.35)',
             userSelect: 'none',
@@ -154,7 +183,7 @@ export default function StatsView() {
                 color: '#ffffff',
                 border: '1px solid #ffaa00',
                 borderRadius: '4px',
-                padding: '3px 8px',
+                padding: '2px 8px',
                 fontSize: isMobile ? '10px' : '12px',
                 fontWeight: 800,
                 cursor: 'pointer',
@@ -176,8 +205,8 @@ export default function StatsView() {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '4px',
-            padding: isMobile ? '4px 8px' : '6px 14px',
+            gap: '3px',
+            padding: isMobile ? '3px 6px' : '4px 12px',
             background: 'rgba(15, 23, 42, 0.98)',
             borderBottom: '1px solid rgba(255, 68, 0, 0.2)',
             flexShrink: 0
@@ -203,7 +232,7 @@ export default function StatsView() {
               gap: '4px',
               overflowX: 'auto',
               width: '100%',
-              paddingBottom: '2px'
+              paddingBottom: '1px'
             }}
           >
             {digitCounts.map((count, d) => {
@@ -216,7 +245,7 @@ export default function StatsView() {
                     background: 'rgba(255,255,255,0.06)',
                     border: '1px solid rgba(255,255,255,0.15)',
                     borderRadius: '3px',
-                    padding: '2px 6px',
+                    padding: '1px 5px',
                     fontSize: '9px',
                     fontWeight: 900,
                     color: isEven ? '#10b981' : '#ef4444',
@@ -243,7 +272,7 @@ export default function StatsView() {
             background: '#0d1117'
           }}
         >
-          <TickCanvasChart history={history} timeHistory={timeHistory} />
+          <TickCanvasChart history={history} timeHistory={timeHistory} pipSize={precision} />
         </div>
       </div>
     </div>
