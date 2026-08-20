@@ -27,61 +27,12 @@ export default function StatsView() {
   const [timeHistory, setTimeHistory] = useState<number[]>([]);
   const [digits, setDigits] = useState<number[]>([]);
 
-  // Draggable positioning state matching DraggableChartOverlay
-  const defaultX = Math.max(10, Math.min(window.innerWidth - 870, (window.innerWidth - 860) / 2));
-  const [position, setPosition] = useState({ x: defaultX, y: 20 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [isMinimized, setIsMinimized] = useState(false);
-
-  const overlayRef = useRef<HTMLDivElement>(null);
-
-  // Responsive screen size listener
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 880) {
-        setPosition({ x: 0, y: 0 });
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (isMobile) return; // Disable drag position offset on mobile full-screen
-    if ((e.target as HTMLElement).closest('.drag-handle')) {
-      setIsDragging(true);
-      setDragOffset({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y
-      });
-    }
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging || isMobile) return;
-      const newX = Math.max(0, Math.min(window.innerWidth - 860, e.clientX - dragOffset.x));
-      const newY = Math.max(0, Math.min(window.innerHeight - 450, e.clientY - dragOffset.y));
-      setPosition({ x: newX, y: newY });
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, dragOffset, isMobile]);
-
   useEffect(() => {
     if (!api_base?.api) return;
+
+    setHistory([]);
+    setTimeHistory([]);
+    setDigits([]);
 
     let sub: any = null;
 
@@ -135,68 +86,80 @@ export default function StatsView() {
   const evenCount = digitCounts.filter((_, i) => i % 2 === 0).reduce((a, b) => a + b, 0);
   const oddCount = totalDigits - evenCount;
   const evenPct = Math.round((evenCount / totalDigits) * 100);
-  const oddPct = Math.round((oddCount / totalDigits) * 100);
+  const oddPct = 100 - evenPct;
   const lastQuote = history.length > 0 ? history[history.length - 1].toFixed(2) : '---';
 
   return (
-    <div className="w-full h-[calc(100vh-110px)] min-h-[500px] bg-[#090d16] relative p-0 sm:p-4 font-mono select-none overflow-hidden flex justify-center">
-      {/* Responsive Container — Adaptable for Mobile & Desktop */}
+    <div
+      style={{
+        width: '100%',
+        height: 'calc(100vh - 165px)',
+        maxHeight: 'calc(100vh - 165px)',
+        minHeight: '380px',
+        padding: isMobile ? '4px' : '8px 16px',
+        boxSizing: 'border-box',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'stretch',
+        background: '#090d16',
+        overflow: 'hidden',
+        fontFamily: 'Inter, sans-serif'
+      }}
+    >
+      {/* Centered Main Stats Dashboard Card */}
       <div
-        ref={overlayRef}
         style={{
-          position: isMobile ? 'relative' : 'absolute',
-          left: isMobile ? 0 : `${position.x}px`,
-          top: isMobile ? 0 : `${position.y}px`,
-          width: isMobile ? '100%' : '860px',
-          height: isMinimized ? '44px' : isMobile ? '100%' : '500px',
-          maxHeight: isMobile ? 'calc(100vh - 120px)' : '520px',
-          background: 'rgba(15, 23, 42, 0.98)',
-          border: isMobile ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
-          borderRadius: isMobile ? '0px' : '8px',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.7)',
-          zIndex: 999,
+          width: '100%',
+          maxWidth: '1280px',
+          height: '100%',
+          background: '#0d1117',
+          border: '1.5px solid #ff4500',
+          borderRadius: '8px',
+          boxShadow: '0 0 30px rgba(255, 68, 0, 0.4), inset 0 0 15px rgba(255, 100, 0, 0.1)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          transition: 'height 0.2s ease'
+          boxSizing: 'border-box'
         }}
       >
-        {/* Header Drag Bar */}
+        {/* Header Bar */}
         <div
-          onMouseDown={handleMouseDown}
-          className="drag-handle"
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: isMobile ? '6px 10px' : '8px 12px',
-            background: 'rgba(30, 41, 59, 0.95)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-            cursor: isMobile ? 'default' : 'move',
-            userSelect: 'none'
+            padding: isMobile ? '6px 10px' : '8px 14px',
+            background: 'linear-gradient(90deg, #1c0200 0%, #3d0800 50%, #1c0200 100%)',
+            borderBottom: '1.5px solid rgba(255, 68, 0, 0.35)',
+            userSelect: 'none',
+            flexShrink: 0
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }} />
-            <span style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 900, color: '#ffffff', letterSpacing: '0.5px' }}>
-              STATS GRAPH
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
+            <span style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: 900, color: '#ffffff', letterSpacing: '0.5px' }}>
+              STATS TELEMETRY GRAPH
+            </span>
+            <span style={{ fontSize: '10px', color: '#ffc266', fontWeight: 800, background: 'rgba(255, 68, 0, 0.25)', padding: '1px 6px', borderRadius: '4px', border: '1px solid rgba(255, 100, 0, 0.4)' }}>
+              {history.length} TICKS
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onMouseDown={e => e.stopPropagation()}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <select
               value={selectedAsset}
               onChange={e => setSelectedAsset(e.target.value)}
               style={{
                 background: '#0f172a',
                 color: '#ffffff',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                border: '1px solid #ffaa00',
                 borderRadius: '4px',
-                padding: '2px 6px',
-                fontSize: isMobile ? '10px' : '11px',
-                fontWeight: 700,
+                padding: '3px 8px',
+                fontSize: isMobile ? '10px' : '12px',
+                fontWeight: 800,
                 cursor: 'pointer',
-                maxWidth: isMobile ? '130px' : 'auto'
+                maxWidth: isMobile ? '140px' : 'auto',
+                boxShadow: '0 0 10px rgba(255, 170, 0, 0.3)'
               }}
             >
               {ASSET_OPTIONS.map(opt => (
@@ -205,102 +168,83 @@ export default function StatsView() {
                 </option>
               ))}
             </select>
-
-            {!isMobile && (
-              <button
-                onClick={() => setIsMinimized(!isMinimized)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  fontWeight: 900
-                }}
-              >
-                {isMinimized ? '□' : '_'}
-              </button>
-            )}
           </div>
         </div>
 
-        {/* Sub-Toolbar Bar (Mobile Responsive Digit Stats Bar) */}
-        {!isMinimized && (
+        {/* Sub-Toolbar Bar (Digit Stats Bar) */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            padding: isMobile ? '4px 8px' : '6px 14px',
+            background: 'rgba(15, 23, 42, 0.98)',
+            borderBottom: '1px solid rgba(255, 68, 0, 0.2)',
+            flexShrink: 0
+          }}
+        >
+          {/* EVEN/ODD and LIVE SPOT Row */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', fontSize: '10px', fontWeight: 900 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ color: '#10b981' }}>EVEN: {evenPct}% ({evenCount})</span>
+              <span style={{ color: '#ef4444' }}>ODD: {oddPct}% ({oddCount})</span>
+            </div>
+            <div style={{ color: '#10b981', fontSize: '11px', fontWeight: 900 }}>
+              LIVE SPOT: <span style={{ color: '#ffffff', background: 'rgba(255,255,255,0.1)', padding: '1px 6px', borderRadius: '3px', marginLeft: '4px' }}>{lastQuote}</span>
+            </div>
+          </div>
+
+          {/* 10-Digit Frequency Badges Row */}
           <div
+            className="no-scrollbar"
             style={{
               display: 'flex',
-              flexDirection: 'column',
+              alignItems: 'center',
               gap: '4px',
-              padding: isMobile ? '4px 8px' : '4px 12px',
-              background: 'rgba(15, 23, 42, 0.98)',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-              zIndex: 45
-            }}
-          >
-            {/* EVEN/ODD and LIVE SPOT Row */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', fontSize: '10px', fontWeight: 900 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ color: '#10b981' }}>EVEN: {evenPct}% ({evenCount})</span>
-                <span style={{ color: '#ef4444' }}>ODD: {oddPct}% ({oddCount})</span>
-              </div>
-              <div style={{ color: '#10b981', fontSize: '10px', fontWeight: 900 }}>
-                SPOT: <span style={{ color: '#ffffff' }}>{lastQuote}</span>
-              </div>
-            </div>
-
-            {/* Scrollable 10-Digit Frequency Badges Row */}
-            <div 
-              className="no-scrollbar"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                overflowX: 'auto',
-                width: '100%',
-                paddingBottom: '2px'
-              }}
-            >
-              {digitCounts.map((count, d) => {
-                const pct = Math.round((count / totalDigits) * 100);
-                const isEven = d % 2 === 0;
-                return (
-                  <span
-                    key={d}
-                    style={{
-                      background: 'rgba(255,255,255,0.06)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '3px',
-                      padding: '1px 5px',
-                      fontSize: '9px',
-                      fontWeight: 800,
-                      color: isEven ? '#10b981' : '#ef4444',
-                      whiteSpace: 'nowrap',
-                      flexShrink: 0
-                    }}
-                  >
-                    {d}:{pct}%
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Rolling Canvas Body Container */}
-        {!isMinimized && (
-          <div
-            style={{
-              flex: 1,
-              position: 'relative',
+              overflowX: 'auto',
               width: '100%',
-              height: '100%',
-              overflow: 'hidden',
-              background: '#0f172a'
+              paddingBottom: '2px'
             }}
           >
-            <TickCanvasChart history={history} timeHistory={timeHistory} />
+            {digitCounts.map((count, d) => {
+              const pct = Math.round((count / totalDigits) * 100);
+              const isEven = d % 2 === 0;
+              return (
+                <span
+                  key={d}
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: '3px',
+                    padding: '2px 6px',
+                    fontSize: '9px',
+                    fontWeight: 900,
+                    color: isEven ? '#10b981' : '#ef4444',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0
+                  }}
+                >
+                  {d}: {pct}%
+                </span>
+              );
+            })}
           </div>
-        )}
+        </div>
+
+        {/* Rolling Canvas Body Container — strictly bounded */}
+        <div
+          style={{
+            flex: 1,
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            minHeight: 0,
+            overflow: 'hidden',
+            background: '#0d1117'
+          }}
+        >
+          <TickCanvasChart history={history} timeHistory={timeHistory} />
+        </div>
       </div>
     </div>
   );

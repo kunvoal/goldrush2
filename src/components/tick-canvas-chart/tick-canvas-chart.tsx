@@ -151,10 +151,10 @@ export function TickCanvasChart({
 
     // Adapt Padding Margins for Mobile Screens
     const isMobile = lW < 500;
-    const padLeft = isMobile ? 48 : 65;   // Y-axis price labels
-    const padRight = isMobile ? 58 : 75;  // Latest price tag badge & right padding
-    const padTop = 22;                    // Top price level margin
-    const padBottom = isMobile ? 38 : 46; // Bottom X-axis timeline margin
+    const padLeft = isMobile ? 54 : 70;   // Y-axis price labels
+    const padRight = isMobile ? 64 : 80;  // Latest price tag badge & right padding
+    const padTop = 20;                    // Top price level margin
+    const padBottom = isMobile ? 48 : 56; // Bottom X-axis timeline margin (clear of control toolbar)
 
     const usableW = Math.max(10, lW - padLeft - padRight);
     const usableH = Math.max(10, lH - padTop - padBottom);
@@ -185,24 +185,24 @@ export function TickCanvasChart({
       ctx.lineTo(padLeft + usableW, y);
       ctx.stroke();
 
-      // Y-axis price label on the left
-      ctx.fillText(val.toFixed(pipSize), padLeft - 4, y);
+      // Y-axis price label on the left (strictly outside plot area)
+      ctx.fillText(val.toFixed(pipSize), padLeft - 5, y);
     }
 
     // Y-Axis Vertical Line
     ctx.strokeStyle = 'rgba(255,255,255,0.18)';
     ctx.beginPath();
-    ctx.moveTo(padLeft, padTop - 5);
+    ctx.moveTo(padLeft, padTop - 2);
     ctx.lineTo(padLeft, padTop + usableH);
     ctx.stroke();
 
     // X-Axis Horizontal Line
     ctx.beginPath();
     ctx.moveTo(padLeft, padTop + usableH);
-    ctx.lineTo(padLeft + usableW + 5, padTop + usableH);
+    ctx.lineTo(padLeft + usableW, padTop + usableH);
     ctx.stroke();
 
-    // Draw X-Axis Time Ticks along the bottom
+    // Draw X-Axis Time Ticks along the bottom (strictly within [padLeft, padLeft + usableW])
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillStyle = '#64748b';
@@ -220,10 +220,19 @@ export function TickCanvasChart({
       ctx.lineTo(x, padTop + usableH + 4);
       ctx.stroke();
 
-      ctx.fillText(timeStr, x, padTop + usableH + 4);
+      ctx.fillText(timeStr, x, padTop + usableH + 5);
     }
 
-    // Clean Streak Run Overlay
+    // =========================================================================
+    // STRICT CLIPPING REGION: Everything inside the plot box is clipped!
+    // No curves, lines, streaks, or digit bubbles will ever overflow axes!
+    // =========================================================================
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(padLeft, padTop, usableW, usableH);
+    ctx.clip();
+
+    // Clean Streak Run Overlay Highlights
     if (timeframe !== 'all' || len <= 120) {
       const activeRuns: StreakRun[] = [];
       if (quotes.length >= 2) {
@@ -262,21 +271,19 @@ export function TickCanvasChart({
         const xStart = getX(run.startTime);
         const xEnd = getX(run.endTime);
 
-        if (xEnd >= padLeft && xStart <= padLeft + usableW) {
-          ctx.fillStyle = run.direction === 1
-            ? 'rgba(0, 230, 153, 0.08)'
-            : 'rgba(255, 51, 85, 0.08)';
-          ctx.fillRect(xStart, padTop, Math.max(xEnd - xStart, 2), usableH);
+        ctx.fillStyle = run.direction === 1
+          ? 'rgba(0, 230, 153, 0.08)'
+          : 'rgba(255, 51, 85, 0.08)';
+        ctx.fillRect(xStart, padTop, Math.max(xEnd - xStart, 2), usableH);
 
-          ctx.strokeStyle = run.direction === 1
-            ? 'rgba(0, 230, 153, 0.25)'
-            : 'rgba(255, 51, 85, 0.25)';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(xStart, padTop); ctx.lineTo(xStart, padTop + usableH);
-          ctx.moveTo(xEnd, padTop); ctx.lineTo(xEnd, padTop + usableH);
-          ctx.stroke();
-        }
+        ctx.strokeStyle = run.direction === 1
+          ? 'rgba(0, 230, 153, 0.25)'
+          : 'rgba(255, 51, 85, 0.25)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(xStart, padTop); ctx.lineTo(xStart, padTop + usableH);
+        ctx.moveTo(xEnd, padTop); ctx.lineTo(xEnd, padTop + usableH);
+        ctx.stroke();
       }
     }
 
@@ -311,7 +318,7 @@ export function TickCanvasChart({
       }
     }
 
-    // Smart Digit Circle Density Filter
+    // Smart Digit Circle Density Filter (Strictly rendered within clipped area)
     let lastDrawnX = -999;
     const minCircleSpacing = isMobile ? 16 : 14;
     const maxVisibleCircles = isMobile ? 35 : 60;
@@ -321,35 +328,31 @@ export function TickCanvasChart({
       const px = getX(times[i]);
       const py = getY(quotes[i]);
 
-      if (px >= padLeft - 10 && px <= padLeft + usableW + 10) {
-        if (px - lastDrawnX >= minCircleSpacing || i === len - 1) {
-          lastDrawnX = px;
+      if (px - lastDrawnX >= minCircleSpacing || i === len - 1) {
+        lastDrawnX = px;
 
-          const qStr = quotes[i].toFixed(pipSize);
-          const lastDigit = parseInt(qStr.slice(-1), 10);
-          const isEven = lastDigit % 2 === 0;
+        const qStr = quotes[i].toFixed(pipSize);
+        const lastDigit = parseInt(qStr.slice(-1), 10);
+        const isEven = lastDigit % 2 === 0;
 
-          const circleRadius = isMobile ? 6.5 : 7.5;
-          ctx.beginPath();
-          ctx.arc(px, py, circleRadius, 0, Math.PI * 2);
-          ctx.fillStyle = isEven ? '#10b981' : '#ef4444';
-          ctx.fill();
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 1;
-          ctx.stroke();
+        const circleRadius = isMobile ? 6.5 : 7.5;
+        ctx.beginPath();
+        ctx.arc(px, py, circleRadius, 0, Math.PI * 2);
+        ctx.fillStyle = isEven ? '#10b981' : '#ef4444';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1;
+        ctx.stroke();
 
-          ctx.fillStyle = '#ffffff';
-          ctx.font = isMobile ? 'bold 7.5px sans-serif' : 'bold 8.5px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(String(lastDigit), px, py);
-          ctx.textBaseline = 'alphabetic';
-          ctx.textAlign = 'left';
-        }
+        ctx.fillStyle = '#ffffff';
+        ctx.font = isMobile ? 'bold 7.5px sans-serif' : 'bold 8.5px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(lastDigit), px, py);
       }
     }
 
-    // Latest price dot, dashed guide line, & right price tag badge
+    // Horizontal dashed guide line to the current spot
     if (len > 0) {
       const lastX = getX(times[len - 1]);
       const lastY = getY(quotes[len - 1]);
@@ -357,31 +360,47 @@ export function TickCanvasChart({
       const isUp = quotes[len - 1] >= prevQ;
       const activeColor = isUp ? '#00e699' : '#ff3355';
 
-      // Pulsing current price dot
-      ctx.beginPath();
-      ctx.arc(lastX, lastY, 4.5, 0, Math.PI * 2);
-      ctx.fillStyle = activeColor;
-      ctx.fill();
-
-      // Horizontal dashed guide line
       ctx.save();
       ctx.setLineDash([3, 3]);
       ctx.strokeStyle = activeColor;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(lastX, lastY);
-      ctx.lineTo(padLeft + usableW + 4, lastY);
+      ctx.lineTo(padLeft + usableW, lastY);
       ctx.stroke();
       ctx.restore();
+    }
 
-      // Price Tag Badge on Right Margin
+    // Restore clip state
+    ctx.restore();
+
+    // =========================================================================
+    // POST-CLIP: Latest price dot & Right Margin Price Badge
+    // =========================================================================
+    if (len > 0) {
+      const lastX = getX(times[len - 1]);
+      const lastY = getY(quotes[len - 1]);
+      const prevQ = len >= 2 ? quotes[len - 2] : quotes[len - 1];
+      const isUp = quotes[len - 1] >= prevQ;
+      const activeColor = isUp ? '#00e699' : '#ff3355';
+
+      // Pulsing current price dot if within visible plot area
+      if (lastX >= padLeft && lastX <= padLeft + usableW) {
+        ctx.beginPath();
+        ctx.arc(lastX, lastY, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = activeColor;
+        ctx.fill();
+      }
+
+      // Price Tag Badge on Right Margin (Strictly Clamped to Canvas Boundaries)
       const tagText = quotes[len - 1].toFixed(pipSize);
       ctx.font = isMobile ? 'bold 9px monospace' : 'bold 10px monospace';
       const tw = ctx.measureText(tagText).width;
-      const tagW = tw + (isMobile ? 6 : 10);
+      const tagW = tw + (isMobile ? 8 : 12);
       const tagH = isMobile ? 16 : 18;
-      const tagX = padLeft + usableW + 4;
-      const tagY = lastY - tagH / 2;
+      const tagX = Math.min(padLeft + usableW + 4, lW - tagW - 2);
+      const clampedY = Math.max(padTop + tagH / 2, Math.min(padTop + usableH - tagH / 2, lastY));
+      const tagY = clampedY - tagH / 2;
 
       ctx.fillStyle = activeColor;
       ctx.beginPath();
@@ -393,7 +412,7 @@ export function TickCanvasChart({
       ctx.font = isMobile ? 'bold 9px monospace' : 'bold 10px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(tagText, tagX + tagW / 2, lastY);
+      ctx.fillText(tagText, tagX + tagW / 2, clampedY);
       ctx.textBaseline = 'alphabetic';
       ctx.textAlign = 'left';
     }
@@ -493,13 +512,28 @@ export function TickCanvasChart({
   }, [redraw]);
 
   return (
-    <div className="w-full h-full relative bg-[#020204]">
-      <div ref={wrapperRef} className="w-full h-full relative min-h-0" style={{ cursor: 'crosshair' }}>
+    <div className="w-full h-full relative bg-[#020204] overflow-hidden">
+      <div ref={wrapperRef} className="w-full h-full relative min-h-0 overflow-hidden" style={{ cursor: 'crosshair' }}>
         <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full" />
       </div>
 
       {/* Responsive Floating Control Strip overlay at bottom */}
-      <div className="absolute bottom-1 left-0 right-0 px-2 sm:px-4 flex items-center justify-between text-[9px] select-none pointer-events-auto bg-transparent z-10 gap-1 overflow-x-auto no-scrollbar">
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '6px',
+          left: '8px',
+          right: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: '9px',
+          userSelect: 'none',
+          pointerEvents: 'auto',
+          zIndex: 20,
+          gap: '6px'
+        }}
+      >
         <div className="flex items-center gap-1 bg-[#020204]/90 backdrop-blur-md border border-white/10 rounded px-1.5 py-0.5 shadow-lg shrink-0 overflow-x-auto no-scrollbar">
           <span className="text-[#38bdf8] font-bold uppercase text-[8px] mr-0.5">Range:</span>
           {['all', '1m', '2m', '5m', '7m', '10m', '13m'].map((tf) => (
