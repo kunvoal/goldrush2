@@ -26,26 +26,18 @@ export default function StatsView() {
   const [history, setHistory] = useState<number[]>([]);
   const [timeHistory, setTimeHistory] = useState<number[]>([]);
   const [digits, setDigits] = useState<number[]>([]);
+  const [isMinimized, setIsMinimized] = useState(false);
 
-  const currentAssetRef = useRef(selectedAsset);
-  useEffect(() => {
-    currentAssetRef.current = selectedAsset;
-  }, [selectedAsset]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!api_base?.api) return;
 
-    // Instantly wipe quotes for new symbol to prevent mixed price scales
-    setHistory([]);
-    setTimeHistory([]);
-    setDigits([]);
-
     let sub: any = null;
-    const targetSymbol = selectedAsset;
 
     try {
       api_base.api.send({
-        ticks_history: targetSymbol,
+        ticks_history: selectedAsset,
         count: 1000,
         end: 'latest',
         style: 'ticks',
@@ -56,39 +48,22 @@ export default function StatsView() {
     }
 
     sub = api_base.api.onMessage()?.subscribe(({ data }: any) => {
-      // Strictly ignore messages if user has switched away to another symbol
-      if (currentAssetRef.current !== targetSymbol) return;
-
       if (data?.msg_type === 'history' && data?.history) {
-        if (data?.echo_req?.ticks_history && data.echo_req.ticks_history !== targetSymbol) {
-          return;
-        }
-        const prices: number[] = (data.history.prices || []).map((p: any) => Number(p));
-        const times: number[] = (data.history.times || []).map((t: any) => Number(t));
+        const prices: number[] = data.history.prices || [];
+        const times: number[] = data.history.times || [];
 
         setHistory(prices);
         setTimeHistory(times.map(t => t * 1000));
-        setDigits(prices.map(p => parseInt(Number(p).toFixed(2).slice(-1), 10)));
+        setDigits(prices.map(p => parseInt(p.toFixed(2).slice(-1), 10)));
       }
 
-      if (data?.msg_type === 'tick' && data?.tick && data.tick.symbol === targetSymbol) {
+      if (data?.msg_type === 'tick' && data?.tick && data.tick.symbol === selectedAsset) {
         const quote = Number(data.tick.quote);
         const epoch = (data.tick.epoch || Date.now() / 1000) * 1000;
         const d = parseInt(quote.toFixed(2).slice(-1), 10);
 
-        setHistory(prev => {
-          // If prev contains quotes from previous symbol with drastically different scale, discard old
-          if (prev.length > 0 && Math.abs(prev[prev.length - 1] - quote) > quote * 0.5) {
-            return [quote];
-          }
-          return [...prev.slice(-999), quote];
-        });
-        setTimeHistory(prev => {
-          if (prev.length > 0 && prev.length !== history.length) {
-            return [epoch];
-          }
-          return [...prev.slice(-999), epoch];
-        });
+        setHistory(prev => [...prev.slice(-999), quote]);
+        setTimeHistory(prev => [...prev.slice(-999), epoch]);
         setDigits(prev => [...prev.slice(-999), d]);
       }
     });
@@ -110,44 +85,29 @@ export default function StatsView() {
   const evenCount = digitCounts.filter((_, i) => i % 2 === 0).reduce((a, b) => a + b, 0);
   const oddCount = totalDigits - evenCount;
   const evenPct = Math.round((evenCount / totalDigits) * 100);
-  const oddPct = 100 - evenPct;
-
-  // Determine dynamic formatting precision from quotes
-  const sampleQuote = history.length > 0 ? history[history.length - 1] : 0;
-  const decCount = sampleQuote.toString().split('.')[1]?.length || 2;
-  const precision = Math.min(4, Math.max(2, decCount));
-  const lastQuote = history.length > 0 ? history[history.length - 1].toFixed(precision) : '---';
+  const oddPct = Math.round((oddCount / totalDigits) * 100);
+  const lastQuote = history.length > 0 ? history[history.length - 1].toFixed(2) : '---';
 
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        maxHeight: '100%',
-        boxSizing: 'border-box',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'stretch',
-        background: '#090d16',
-        overflow: 'hidden',
-        fontFamily: 'Inter, sans-serif',
-        padding: isMobile ? '4px 6px' : '6px 14px'
-      }}
-    >
-      {/* Centered Main Stats Dashboard Card */}
+    <div className="w-full h-full min-h-0 bg-[#090d16] relative p-1.5 sm:p-3 font-mono select-none overflow-hidden flex flex-col justify-center items-stretch box-border">
+      {/* Strict Parametric Container — 100% bounded with Zero Overflow */}
       <div
+        ref={containerRef}
         style={{
+          position: 'relative',
           width: '100%',
-          maxWidth: '1280px',
+          maxWidth: '1140px',
           height: '100%',
-          maxHeight: '100%',
-          background: '#0d1117',
-          border: '1.5px solid #ff4500',
+          maxHeight: isMinimized ? '44px' : '100%',
+          margin: '0 auto',
+          background: 'rgba(15, 23, 42, 0.98)',
+          border: '1.5px solid rgba(255, 69, 0, 0.45)',
           borderRadius: '8px',
-          boxShadow: '0 0 30px rgba(255, 68, 0, 0.4), inset 0 0 15px rgba(255, 100, 0, 0.1)',
+          boxShadow: '0 0 25px rgba(255, 69, 0, 0.25), inset 0 0 15px rgba(255, 120, 0, 0.05)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
+          transition: 'max-height 0.2s ease',
           boxSizing: 'border-box'
         }}
       >
@@ -157,7 +117,7 @@ export default function StatsView() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: isMobile ? '4px 8px' : '6px 12px',
+            padding: isMobile ? '6px 10px' : '8px 14px',
             background: 'linear-gradient(90deg, #1c0200 0%, #3d0800 50%, #1c0200 100%)',
             borderBottom: '1.5px solid rgba(255, 68, 0, 0.35)',
             userSelect: 'none',
@@ -166,11 +126,8 @@ export default function StatsView() {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
-            <span style={{ fontSize: isMobile ? '11px' : '13px', fontWeight: 900, color: '#ffffff', letterSpacing: '0.5px' }}>
+            <span style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 900, color: '#ffffff', letterSpacing: '0.6px' }}>
               STATS TELEMETRY GRAPH
-            </span>
-            <span style={{ fontSize: '10px', color: '#ffc266', fontWeight: 800, background: 'rgba(255, 68, 0, 0.25)', padding: '1px 6px', borderRadius: '4px', border: '1px solid rgba(255, 100, 0, 0.4)' }}>
-              {history.length} TICKS
             </span>
           </div>
 
@@ -181,14 +138,14 @@ export default function StatsView() {
               style={{
                 background: '#0f172a',
                 color: '#ffffff',
-                border: '1px solid #ffaa00',
+                border: '1px solid rgba(255, 69, 0, 0.4)',
                 borderRadius: '4px',
                 padding: '2px 8px',
-                fontSize: isMobile ? '10px' : '12px',
-                fontWeight: 800,
+                fontSize: isMobile ? '10px' : '11px',
+                fontWeight: 700,
                 cursor: 'pointer',
                 maxWidth: isMobile ? '140px' : 'auto',
-                boxShadow: '0 0 10px rgba(255, 170, 0, 0.3)'
+                boxShadow: '0 0 10px rgba(0,0,0,0.5)'
               }}
             >
               {ASSET_OPTIONS.map(opt => (
@@ -197,84 +154,107 @@ export default function StatsView() {
                 </option>
               ))}
             </select>
+
+            <button
+              onClick={() => setIsMinimized(!isMinimized)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '4px',
+                color: 'rgba(255, 255, 255, 0.85)',
+                cursor: 'pointer',
+                padding: '2px 8px',
+                fontSize: '11px',
+                fontWeight: 900
+              }}
+              title={isMinimized ? 'Expand' : 'Minimize'}
+            >
+              {isMinimized ? '🗖' : '─'}
+            </button>
           </div>
         </div>
 
-        {/* Sub-Toolbar Bar (Digit Stats Bar) */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '3px',
-            padding: isMobile ? '3px 6px' : '4px 12px',
-            background: 'rgba(15, 23, 42, 0.98)',
-            borderBottom: '1px solid rgba(255, 68, 0, 0.2)',
-            flexShrink: 0
-          }}
-        >
-          {/* EVEN/ODD and LIVE SPOT Row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', fontSize: '10px', fontWeight: 900 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ color: '#10b981' }}>EVEN: {evenPct}% ({evenCount})</span>
-              <span style={{ color: '#ef4444' }}>ODD: {oddPct}% ({oddCount})</span>
-            </div>
-            <div style={{ color: '#10b981', fontSize: '11px', fontWeight: 900 }}>
-              LIVE SPOT: <span style={{ color: '#ffffff', background: 'rgba(255,255,255,0.1)', padding: '1px 6px', borderRadius: '3px', marginLeft: '4px' }}>{lastQuote}</span>
-            </div>
-          </div>
-
-          {/* 10-Digit Frequency Badges Row */}
+        {/* Sub-Toolbar Bar (Live Digit Stats & Frequency Badges) */}
+        {!isMinimized && (
           <div
-            className="no-scrollbar"
             style={{
               display: 'flex',
-              alignItems: 'center',
+              flexDirection: 'column',
               gap: '4px',
-              overflowX: 'auto',
-              width: '100%',
-              paddingBottom: '1px'
+              padding: isMobile ? '4px 8px' : '5px 14px',
+              background: 'rgba(15, 23, 42, 0.98)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              flexShrink: 0,
+              zIndex: 5
             }}
           >
-            {digitCounts.map((count, d) => {
-              const pct = Math.round((count / totalDigits) * 100);
-              const isEven = d % 2 === 0;
-              return (
-                <span
-                  key={d}
-                  style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    borderRadius: '3px',
-                    padding: '1px 5px',
-                    fontSize: '9px',
-                    fontWeight: 900,
-                    color: isEven ? '#10b981' : '#ef4444',
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0
-                  }}
-                >
-                  {d}: {pct}%
-                </span>
-              );
-            })}
-          </div>
-        </div>
+            {/* EVEN/ODD and LIVE SPOT Row */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', fontSize: '10px', fontWeight: 900 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ color: '#10b981' }}>EVEN: {evenPct}% ({evenCount})</span>
+                <span style={{ color: '#ef4444' }}>ODD: {oddPct}% ({oddCount})</span>
+              </div>
+              <div style={{ color: '#10b981', fontSize: '10px', fontWeight: 900 }}>
+                LIVE SPOT: <span style={{ color: '#ffffff' }}>{lastQuote}</span>
+              </div>
+            </div>
 
-        {/* Rolling Canvas Body Container — strictly bounded */}
-        <div
-          style={{
-            flex: 1,
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-            minHeight: 0,
-            overflow: 'hidden',
-            background: '#0d1117'
-          }}
-        >
-          <TickCanvasChart history={history} timeHistory={timeHistory} pipSize={precision} />
-        </div>
+            {/* Scrollable 10-Digit Frequency Badges Row */}
+            <div 
+              className="no-scrollbar"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                overflowX: 'auto',
+                width: '100%',
+                paddingBottom: '2px'
+              }}
+            >
+              {digitCounts.map((count, d) => {
+                const pct = Math.round((count / totalDigits) * 100);
+                const isEven = d % 2 === 0;
+                return (
+                  <span
+                    key={d}
+                    style={{
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      borderRadius: '3px',
+                      padding: '1px 6px',
+                      fontSize: '9px',
+                      fontWeight: 800,
+                      color: isEven ? '#10b981' : '#ef4444',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0
+                    }}
+                  >
+                    {d}:{pct}%
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Rolling Canvas Body Container — strictly constrained */}
+        {!isMinimized && (
+          <div
+            style={{
+              flex: 1,
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+              minHeight: 0,
+              overflow: 'hidden',
+              background: '#020204'
+            }}
+          >
+            <TickCanvasChart history={history} timeHistory={timeHistory} />
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
